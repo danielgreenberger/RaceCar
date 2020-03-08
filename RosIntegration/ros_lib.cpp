@@ -64,24 +64,28 @@ sensor_msgs::PointCloud2 RosIntegration::PointCloudConversion(rs2::points pc)
 
 void BaseRealSenseNode::publishPointCloud(rs2::points pc, const ros::Time& t, const rs2::frameset& frameset)
 {
-    std::vector<NamedFilter>::iterator pc_filter = find_if(_filters.begin(), _filters.end(), [] (NamedFilter s) { return s._name == "pointcloud"; } );
-    rs2_stream texture_source_id = static_cast<rs2_stream>(pc_filter->_filter->get_option(rs2_option::RS2_OPTION_STREAM_FILTER));
-    bool use_texture = texture_source_id != RS2_STREAM_ANY;
+    /* Init */
     static int warn_count(0);
     static const int DISPLAY_WARN_NUMBER(5);
     rs2::frameset::iterator texture_frame_itr = frameset.end();
     
-    
-
     int texture_width(0), texture_height(0);
     int num_colors(0);
-
-    const rs2::vertex* vertex = pc.get_vertices();
-    const rs2::texture_coordinate* color_point = pc.get_texture_coordinates();
+    
+    
+    /* Check if to use texture */
+    std::vector<NamedFilter>::iterator pc_filter = find_if(_filters.begin(), _filters.end(), [] (NamedFilter s) { return s._name == "pointcloud"; } );
+    
+    rs2_stream texture_source_id = static_cast<rs2_stream>(pc_filter->_filter->get_option(rs2_option::RS2_OPTION_STREAM_FILTER));
+    bool use_texture = texture_source_id != RS2_STREAM_ANY;
+    
     
     /* Filter invalid data */
+    const rs2::vertex* vertex = pc.get_vertices();     // Points
+    const rs2::texture_coordinate* color_point = pc.get_texture_coordinates();  // Texture
     std::list<unsigned int> valid_indices;
-    for (size_t point_idx=0; point_idx < pc.size(); point_idx++, vertex++, color_point++)
+    
+    for (size_t point_idx = 0; point_idx < pc.size(); point_idx++, vertex++, color_point++)
     {
         if (static_cast<float>(vertex->z) > 0)
         {
@@ -113,6 +117,8 @@ void BaseRealSenseNode::publishPointCloud(rs2::points pc, const ros::Time& t, co
         texture_height = texture_frame.get_height();
         num_colors = texture_frame.get_bytes_per_pixel();
         uint8_t* color_data = (uint8_t*)texture_frame.get_data();
+        
+        /* Get color format */
         std::string format_str;
         switch(texture_frame.get_profile().format())
         {
@@ -125,6 +131,7 @@ void BaseRealSenseNode::publishPointCloud(rs2::points pc, const ros::Time& t, co
             default:
                 throw std::runtime_error("Unhandled texture format passed in pointcloud " + std::to_string(texture_frame.get_profile().format()));
         }
+        
         msg_pointcloud.point_step = addPointField(msg_pointcloud, format_str.c_str(), 1, sensor_msgs::PointField::FLOAT32, msg_pointcloud.point_step);
         msg_pointcloud.row_step = msg_pointcloud.width * msg_pointcloud.point_step;
         msg_pointcloud.data.resize(msg_pointcloud.height * msg_pointcloud.row_step);

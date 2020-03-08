@@ -451,7 +451,7 @@ RaceCar &RaceCar::getCameraOutputAndSendToRemote()
 
         ROS_CODE_SECTION
         (
-            /* Point Cloud */
+            /* Publish point cloud */
             std::cout << "Get point cloud" <<std::endl;
             auto real_sense_pc  = _camera.getPointCloud();
             sensor_msgs::PointCloud2 ros_pc = RosIntegration::PointCloudConversion(real_sense_pc);

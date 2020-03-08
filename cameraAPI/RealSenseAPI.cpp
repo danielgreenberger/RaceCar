@@ -421,7 +421,7 @@ void RealSense::setupAccel()
 }
 
 
-
+// dgreenbe TODO add "can_resolve()" call to _config
 
 
 void RealSense::startCamera()
@@ -595,6 +595,9 @@ float RealSense::getDepthUnits()
 
 }
 
+
+// dgreenbe todo maybe add synchronizations
+// dgreenbe todo maybe add filters
 
 rs2::points RealSense::getPointCloud()
 {
