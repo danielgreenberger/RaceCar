@@ -9,16 +9,15 @@
 
 #ifdef ROS_COMPILATION
 
-//#include <string>
-//#include <queue>
-//#include <sstream>
-//#include <iostream>
-//#include <thread>
-#include <librealsense2/rs.hpp>
-#include "ros_defs.h"
+
+
+
+// ROS API
 #include "sensor_msgs/PointCloud2.h"
 #include "sensor_msgs/point_cloud2_iterator.h"
 
+// RosIntegration
+#include "ros_defs.h"
 
 
 
@@ -27,7 +26,7 @@
 /////           MACROS          /////
 /////////////////////////////////////
 
-
+#define _ASSERT(cond, exception)
 
 
 /////////////////////////////////////////
@@ -36,6 +35,7 @@
 
 namespace RosIntegration
 {
+
 	
 /*
 dgreenbe TODO:
@@ -52,6 +52,9 @@ dgreenbe TODO:
 * @return          ROS PointCloud2 msg
 =========================================================*/
 sensor_msgs::PointCloud2 PointCloudConversion(rs2::points pc);
+sensor_msgs::PointCloud2 PointCloudConversion(rs2::points pc, const rs2::video_frame color_frame);
+
+
 
 
 

@@ -403,6 +403,19 @@ public:
         * @author          TODO
         =========================================================*/
         rs2::points getPointCloud();
+        
+        /*=======================================================
+        * @brief           TODO
+        *
+        * @description     TODO
+        *
+        * @param           TODO
+        *
+        * @return          TODO
+        *
+        * @author          TODO
+        =========================================================*/
+        rs2::points getColorPointCloud();
 
 
 

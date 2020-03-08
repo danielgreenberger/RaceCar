@@ -609,16 +609,39 @@ rs2::points RealSense::getPointCloud()
     }
     
     /* Convert to pointcloud */
-      // dgreenbe TODO, consider dynamic allocation with shared pointer
-      //  std::shared_ptr<rs2::pointcloud> pointcloud (new rs2::pointcloud());
-  
-    rs2::pointcloud pc;
-    auto points = pc.calculate(depth_frame);
+    auto pc = std::make_shared<rs2::pointcloud>();
+    auto points = pc->calculate(depth_frame);
     return points;
-  // dgreenbe todo maybe add texture
-  
+   
+}
+
+
+
+rs2::points RealSense::getColorPointCloud()
+{
+    /* Assert types are correct */
+    // Color+depth images exist with the same resulution
     
     
+    /* Extract depth+color frames from buffer */
+    auto depth_frame = _frames.get_depth_frame();
+    auto color_frame = _frames.get_color_frame();
+
+    if (!depth_frame || !color_frame)
+    {
+        throw IRealSenseBadSettingUse();
+    }
+    
+    /* Convert to pointcloud */
+    auto pc = std::make_shared<rs2::pointcloud>();
+    auto points = pc->calculate(depth_frame);
+    
+    /* Apply color to PointCloud */
+    pc->map_to(color_frame);
+    
+    
+    return points;
+   
 }
 
 
