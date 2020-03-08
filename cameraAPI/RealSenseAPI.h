@@ -23,6 +23,7 @@
 
 #include <librealsense2/rs.hpp>
 #include "Camera_types.h"
+#include "ros_lib.h"
 
 class RealSense{
 
@@ -416,6 +417,21 @@ public:
         * @author          TODO
         =========================================================*/
         rs2::points getColorPointCloud();
+        
+        #ifdef ROS_COMPILATION
+        /*=======================================================
+        * @brief           TODO
+        *
+        * @description     TODO
+        *
+        * @param           TODO
+        *
+        * @return          TODO
+        *
+        * @author          TODO
+        =========================================================*/
+        sensor_msgs::PointCloud2 getROSPointCloud2();
+        #endif // ROS_COMPILATION
 
 
 

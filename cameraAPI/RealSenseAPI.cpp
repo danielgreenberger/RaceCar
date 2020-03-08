@@ -5,6 +5,7 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
+#include "ros_lib.h"
 #define NUM_OF_RS_SENSORS 3
 
 //typedef enum rs2_format
@@ -643,6 +644,39 @@ rs2::points RealSense::getColorPointCloud()
     return points;
    
 }
+
+#ifdef ROS_COMPILATION
+
+sensor_msgs::PointCloud2 RealSense::getROSPointCloud2()
+{
+    /* Assert types are correct */
+    // Color+depth images exist with the same resulution
+    
+    
+    /* Extract depth+color frames from buffer */
+    auto depth_frame = _frames.get_depth_frame();
+    auto color_frame = _frames.get_color_frame();
+
+    if (!depth_frame || !color_frame)
+    {
+        throw IRealSenseBadSettingUse();
+    }
+    
+    /* Convert to pointcloud */
+    auto pc = std::make_shared<rs2::pointcloud>();
+    auto points = pc->calculate(depth_frame);
+    
+    /* Apply color to PointCloud */
+    pc->map_to(color_frame);
+    
+    /* Convert to PointCloud2 */
+    sensor_msgs::PointCloud2 pcl_msg = RosIntegration::PointCloudConversion(points, color_frame);
+    
+    return pcl_msg;
+   
+}
+
+#endif // ROS_COMPILATION
 
 
 
