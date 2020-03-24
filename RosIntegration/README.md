@@ -32,7 +32,7 @@ For example RealSense has a ROS driver (better than re-implementing)
 
 ## ROS basic concepts
 
-#### Nodes
+### Nodes
 
 Nodes are the basic execution entities in ROS, representing the equivalent of a "thread" or "process" in traditional OS. 
 
@@ -43,14 +43,50 @@ Nodes communicate with each other using ROS facilities.
 TODO - explain clearly the connection between nodes, topics, and related infrastructure (service, publisher, listener, etc.)
 TODO - (maybe add a table with comparision of ROS concepot to Linux, like process=Node etc)
 
-#### Topics
+### Topics
+
+### Packages and Workspaces
+
+#### overview
+
+TODO - what is a package and whats the difference from node?
+
+
+
+#### Creating workspaces with catkin
+
+#### Sourcing the workspace
+TODO - explain why we need to source the workspace
+
+## ROS basic tools
+
+### roscd
+
+
+## ROS integration with RaceCar
+### ROS installation on Jeston
+### ROS compilation enviroment
+- A preprocessor macro for all ROS-related code and definitions
+
+The compilation for ROS is done using catkin which is a modifies version of cmake.
+
+TODO insert a guide on how to create catkin workspace with cmake, step-by-step:
+(maybe we can use catkin_create_pkg for some of the steps)
+1. Create catkin workspace
+2. Copy files
+3. Edit cmake
+4. Add other nodes (such as RealSense wrapper)
+5. run catkin_make
 
 
 
 
-## ROS installation on Jeston
+
+
+
+
 ## RaceCar RosIntegration API
-## Software environment
+
 ## Sensing HW used
 ## Examples
 ###### Code
@@ -62,3 +98,13 @@ TODO - (maybe add a table with comparision of ROS concepot to Linux, like proces
 This section provides sources for more in-depth understanding of ROS
 ###### ROS reference links
 http://wiki.ros.org/roscpp/Overview - ROS c++ library -- documentation
+
+###### Catkin
+
+http://wiki.ros.org/catkin/Tutorials - Catkin tutorial
+
+
+## TODO - delete after finishing
+- [] Ros launch
+- [] Add implementation-related documentation here or in the c file (for example publisher/listener)
+- [] Add info about ROS launch
