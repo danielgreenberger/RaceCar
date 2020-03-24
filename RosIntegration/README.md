@@ -104,6 +104,7 @@ http://wiki.ros.org/roscpp/Overview - ROS c++ library -- documentation
 
 http://wiki.ros.org/catkin/Tutorials - Catkin tutorial
 http://wiki.ros.org/catkin/Tutorials/using_a_workspace - Building a package with catkin_make
+http://wiki.ros.org/catkin/CMakeLists.txt   -  How to create a Cmake file for catkin
 
 
 ## TODO - delete after finishing
