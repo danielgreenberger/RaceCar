@@ -61,6 +61,7 @@ TODO - explain why we need to source the workspace
 ## ROS basic tools
 
 ### roscd
+### rospack 
 
 
 ## ROS integration with RaceCar
@@ -102,6 +103,7 @@ http://wiki.ros.org/roscpp/Overview - ROS c++ library -- documentation
 ###### Catkin
 
 http://wiki.ros.org/catkin/Tutorials - Catkin tutorial
+http://wiki.ros.org/catkin/Tutorials/using_a_workspace - Building a package with catkin_make
 
 
 ## TODO - delete after finishing
