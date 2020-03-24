@@ -4,7 +4,22 @@
 
 
 ## Introduction
+
+RaceCar is a robust robotic car platform which can be used for a wide variety of applications. 
+
+TODO add explanation about ROS. 
+
+
+This document descripbes the integration of the RaceCar platform with with ROS.  
+
+
 ## Motivation
+
+The integration with ROS has a few great advantages:
+1. modularity - ROS comes with many built-in and other usefull tools which can be used on the platform
+2. infrastructure - ROS provides communication between nodes
+3. Third party support - For example RealSense has a ROS driver (better than re-implementing)
+
 ## Cartographer algorithm description
 ## API
 ## Software environment
