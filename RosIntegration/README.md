@@ -1,4 +1,5 @@
-# RaceCar
+# ROS wrapper for RaceCar
+
 
 
 
@@ -47,7 +48,7 @@ TODO - (maybe add a table with comparision of ROS concepot to Linux, like proces
 
 
 
-
+## ROS installation on Jeston
 ## RaceCar RosIntegration API
 ## Software environment
 ## Sensing HW used
@@ -60,3 +61,4 @@ TODO - (maybe add a table with comparision of ROS concepot to Linux, like proces
 ## Bibliography
 This section provides sources for more in-depth understanding of ROS
 ###### ROS reference links
+http://wiki.ros.org/roscpp/Overview - ROS c++ library -- documentation
