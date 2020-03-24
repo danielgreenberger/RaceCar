@@ -41,7 +41,9 @@
 
 
 
-#else // No ROS integration
+#else   
+    // Not compiling for ROS environment. 
+    // All ROS code and definitions are redacted by the preprocessor. 
 
 #define ROS_CODE_SECTION(code)
 

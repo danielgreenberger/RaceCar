@@ -6,7 +6,11 @@
 
 ## Introduction
 
-RaceCar is a robust robotic car platform which can be used for a wide variety of applications. 
+ROS (Robot Operating System) is a set of tools and libraries which behave as pesudo-OS which help software developers create robot applications.
+
+Although ROS is not a real OS , it provides services which are typically provided by operating systems. 
+
+ROS (Robot Operating System) provides libraries and tools to help software developers create robot applications. It provides hardware abstraction, device drivers, libraries, visualizers, message-passing, package management, and more. ROS is licensed under an open source, BSD license.
 
 TODO add explanation about ROS (its a meta-OS, open source, designed for Robot builders) 
 
@@ -43,7 +47,10 @@ Nodes communicate with each other using ROS facilities.
 TODO - explain clearly the connection between nodes, topics, and related infrastructure (service, publisher, listener, etc.)
 TODO - (maybe add a table with comparision of ROS concepot to Linux, like process=Node etc)
 
-### Topics
+### Messages and Topics
+
+ROS nodes can communicate with each other by sending and receiving messages. 
+TODO - continue
 
 ### Packages and Workspaces
 
@@ -61,15 +68,31 @@ TODO - explain why we need to source the workspace
 ## ROS basic tools
 
 ### roscd
+
 ### rospack 
+### rqt_launch 
+This tools allows easy running of multiple nodes together. 
+In our project it will be used for running RaceCar, RealSense driver and google cartographer. 
+
+For more information: http://wiki.ros.org/rqt_launch
+
+### rqt_console
+
+ROS has a dedicated topic called "rosout" which is used as "printf" by nodes.  
+This is a graphical tool allowing to view log prints of nodes in the ROS system. 
+
+For more information: http://wiki.ros.org/rqt_console
 
 
 ## ROS integration with RaceCar
 ### ROS installation on Jeston
 ### ROS compilation enviroment
+In order to avoid code duplication, the ROS integration will be embedded in the RaceCar project under special 
+compilation flag. 
+
 - A preprocessor macro for all ROS-related code and definitions
 
-The compilation for ROS is done using catkin which is a modifies version of cmake.
+The compilation for ROS is done using catkin which is a modifies version of cmake (TODO re-write it more clearly)
 
 TODO insert a guide on how to create catkin workspace with cmake, step-by-step:
 (maybe we can use catkin_create_pkg for some of the steps)
@@ -87,6 +110,12 @@ TODO insert a guide on how to create catkin workspace with cmake, step-by-step:
 
 
 ## RaceCar RosIntegration API
+
+### Ros publisher
+
+This is a template class which serves as a simple wrapper for ROS topic publishing functionality. 
+
+
 
 ## Sensing HW used
 ## Examples
@@ -111,3 +140,6 @@ http://wiki.ros.org/catkin/CMakeLists.txt   -  How to create a Cmake file for ca
 - [] Ros launch
 - [] Add implementation-related documentation here or in the c file (for example publisher/listener)
 - [] Add info about ROS launch
+- [] Change RaceCar log prints to a wrapper function/macro and direct all log prints to ROS_LOG
+- [] Add a small section with "Get started" which runs rqt_launch and rqt_console and chooses different launch files
+- [] Add information about TF
