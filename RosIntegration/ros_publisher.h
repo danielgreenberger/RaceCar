@@ -10,7 +10,10 @@
 		1. A FIFO memory buffer.
 		2. A thread which registers on the ROS system and publishes the FIFO content to a given ROS topic.  
 	
-	TODO add design considerations and trade-offs.
+	The implementation using a buffer is done is order to minimize the latency on the RaceCar 
+    main thread. 
+    
+    The only drawback is an increased latency in publishing a single message to ROS. 
 */
 
 #ifdef ROS_COMPILATION
@@ -30,7 +33,7 @@
 /////////////////////////////////////
 
 // Debug printing
-#define ROS_INTEGRATION_DEBUG_PRINT_ENABLE 0
+#define ROS_INTEGRATION_DEBUG_PRINT_ENABLE (0)  // 0 - Debug printing is OFF, 1 - Debug printing is ON
 
 #if (ROS_INTEGRATION_DEBUG_PRINT_ENABLE == 1)
 #define ROS_INTEGRATION_DEBUG_PRINT(text)       \
@@ -93,7 +96,7 @@ namespace RosIntegration
 	public:
 		Publisher (string topic_name, string node_name = "",  uint_32 flags = NO_FLAGS, uint_32 max_queue_size = ROS_TOPIC_QUEUE_BUFFER_SIZE)
 			:
-                        m_topic_name(topic_name),
+            m_topic_name(topic_name),
 			m_node_name(node_name), 
 			m_max_queue_size(),
 			m_queue(), 
@@ -248,10 +251,7 @@ namespace RosIntegration
 		{
 			/* Init ROS node */
 			ros::init(m_argc, nullptr, m_node_name);
-			if (false == ros::master::check())
-			{
-				exit(0); // TODO maybe just return or print an error?
-			}
+			_ASSERT(ros::master::check(), todo); // Make sure ROS main process is running
 			ros::NodeHandle node_handler; 
 			
 			/* Register to publish for topic */
@@ -274,7 +274,7 @@ namespace RosIntegration
 					if (msg_exists)
 					{
                                                 
-						msg = m_queue.front();  // TODO: use memcopy, reference, or pointer?
+						msg = m_queue.front();  
 						m_queue.pop();
 					}
 				)
@@ -296,9 +296,9 @@ namespace RosIntegration
 			}
 			
 			/* Finish node execution */
-			ROS_INFO("ROS publisher stop. "); // TODO add string with node name, also maybe add print for main program?
+			ROS_INFO_STREAM("ROS publisher stop.  Node name: " << m_node_name); 
 			ROS_INTEGRATION_DEBUG_PRINT("ROS publisher stop. ");
-                        m_publisher_enabled = false;
+            m_publisher_enabled = false;
 			
 		}
 		
