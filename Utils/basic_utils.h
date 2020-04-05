@@ -18,7 +18,11 @@
 * @brief           Optimization macros for better branch predition
 *
 * @description     These macros provide a hint for the compiler on the expected value of x.
-*                  They can be used to optimize performence when the value of a boolean
+*                  This does not impact the correctness of the expression evaluation, 
+*                  however it improves perfomance in cases where the expression was evaluated as 
+*                  expected (true for _Usually, false for _Rarely).
+*
+*                  These macros can be used to optimize performence when the value of a boolean
 *                  condition is almost always the same value. 
 *
 * @param           x  -  A boolean condition
@@ -92,7 +96,7 @@ inline void __ASSERT (const bool condition, const std::exception& e, const char*
 {
     if (_Rarely(!condition))
     {
-        std::cerr << "\r\nAssrtation failed at " << assert_func;
+        std::cerr << "\r\nAssertation failed at " << assert_func;
         std::cerr << "(" << assert_file << ":" << assert_line <<"):   \r\n";
         std::cerr << assert_text << std::endl;
         throw e;
