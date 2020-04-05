@@ -9,6 +9,29 @@
 
 
 
+////////////////////////////////////////////////
+/////         PROCESSOR OPTIMIZATION       /////
+////////////////////////////////////////////////
+
+
+/*=======================================================
+* @brief           Optimization macros for better branch predition
+*
+* @description     These macros provide a hint for the compiler on the expected value of x.
+*                  They can be used to optimize performence when the value of a boolean
+*                  condition is almost always the same value. 
+*
+* @param           x  -  A boolean condition
+*
+* @return          The same value as x. 
+*
+* @author          Daniel Greenberger
+=========================================================*/
+#define _Usually(x)      __builtin_expect(!!(x), 1) 
+#define _Rarely(x)    __builtin_expect(!!(x), 0) 
+
+
+
 
 ////////////////////////////////////////////////
 /////          ASSERT & EXCEPTIONS         /////
@@ -30,7 +53,13 @@
 *
 * @author          Daniel Greenberger
 =========================================================*/
-#define ASSERT(condition, exception) do{ _ASSERT((cond), (exception), __FILE__, __LINE__, __FUNC__, #cond) }while(0);
+#define ASSERT(condition, exception)                                                                                  \
+do                                                                                                                    \
+{                                                                                                                     \
+    const char* condition_string = #condition;                                                                        \
+    __ASSERT((condition), (exception), __FILE__, __LINE__, __PRETTY_FUNCTION__, (const char*) condition_string);      \
+}                                                                                                                     \
+while(0);                                                                                                             
 
 
 /*=======================================================
@@ -58,12 +87,14 @@
 * @author          Daniel Greenberger
 =========================================================*/
 
-inline void __ASSERT (const bool condition, std::exception& e, char* assert_file, 
+inline void __ASSERT (const bool condition, const std::exception& e, const char* assert_file, 
                             uint32_t assert_line, const char* assert_func, const char* assert_text )
 {
-    if unlikely(!cond)
+    if (_Rarely(!condition))
     {
-        std::cerr << "Assrtation failed at " << assert_func << "(" << assert_file << ":" << assert_line <<"):   " << assert_text;
+        std::cerr << "\r\nAssrtation failed at " << assert_func;
+        std::cerr << "(" << assert_file << ":" << assert_line <<"):   \r\n";
+        std::cerr << assert_text << std::endl;
         throw e;
     }
 }
@@ -78,16 +109,17 @@ inline void __ASSERT (const bool condition, std::exception& e, char* assert_file
 *
 * @param           i  -  Bit number to create the mask for. 
 *                        For example:  i=3  ->  output will be the binary value 0b00000000000000000000000000001000
+*                        Bit value must be in the range:     0 <= bit_value <= 31 to prevent overflow.
 *
 * @return          Bitmask of the provided bit.
 *
 * @author          Daniel Greenberger
 =========================================================*/
-constexpr uint_32 __BIT(uint_32 i)
+constexpr uint32_t __BIT(int i)
 {
-    static_assert(i <= 31, "__BIT:  Bit value must be in the range:     0 <= bit_value <= 31");
     return (1UL << i);
 }
+
 
 
 
@@ -118,7 +150,7 @@ constexpr uint_32 __BIT(uint_32 i)
 *
 * @author          Daniel Greenberger
 =========================================================*/
-#define __CRITICAL_SECTION(mutex, code)     do{   mutex.lock();  code;   m_mutex.unlock();    } while(0);
+#define __CRITICAL_SECTION(mutex, code)     do{   mutex.lock();  code;   mutex.unlock();    } while(0);
 
 /*
     This is an example wrapper for the critical section macro. 

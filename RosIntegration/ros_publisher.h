@@ -24,11 +24,12 @@
 #include <iostream>
 #include <thread>
 #include "ros_defs.h"
+#include "basic_utils.h"
 
 
 namespace RosIntegration
 {
-
+using string = std::string;
 
 /////////////////////////////////////
 /////           MACROS          /////
@@ -61,7 +62,7 @@ namespace RosIntegration
 
 
 /* Default max FIFO capacity */
-constexpr int ROS_TOPIC_QUEUE_BUFFER_SIZE = 1000;
+const int ROS_TOPIC_QUEUE_BUFFER_SIZE = 1000;
 
 
 /* 
@@ -70,7 +71,7 @@ constexpr int ROS_TOPIC_QUEUE_BUFFER_SIZE = 1000;
         This is the rate in which the FIFO will be checked for new messages
         to be published to the ROS system.
 */
-constexpr int ROS_PUBLISH_RATE_PER_SECOND = 10;
+const int ROS_PUBLISH_RATE_PER_SECOND = 10;
 
 
 
@@ -80,7 +81,7 @@ constexpr int ROS_PUBLISH_RATE_PER_SECOND = 10;
        
        
 */
-constexpr int DEFAULT_FLAGS = 0;
+const int DEFAULT_FLAGS = 0;
 
 typedef enum
 {
@@ -92,8 +93,8 @@ typedef enum
 
 
 /* ROS node name */
-constexpr string INVALID_NODE_NAME = "";
-constexpr string DEFAULT_NAME_PREFIX = "Jetson_Publisher_";
+const string INVALID_NODE_NAME = "";
+const string DEFAULT_NAME_PREFIX = "Jetson_Publisher_";
 
 
 
@@ -106,7 +107,7 @@ constexpr string DEFAULT_NAME_PREFIX = "Jetson_Publisher_";
 template <typename T>
 class Publisher
 {
-    
+
     
 public:
 
@@ -126,8 +127,10 @@ public:
     =========================================================*/
     Publisher (string topic_name, uint32_t flags = DEFAULT_FLAGS, uint32_t max_queue_size = ROS_TOPIC_QUEUE_BUFFER_SIZE)
         :
-        Publisher (topic_name, INVALID_NODE_NAME, flags, max_queue_size);
-    {}
+        Publisher (topic_name, INVALID_NODE_NAME, flags, max_queue_size)
+    {
+        
+    }
     
     /*=======================================================
     * @brief           Constructor for the publisher class allowing to define a custom name for the node.
@@ -142,7 +145,7 @@ public:
     *
     * @author          Daniel Greenberger
     =========================================================*/
-    Publisher (string topic_name, string node_name = INVALID_NODE_NAME,  
+    Publisher (string topic_name, string node_name,  
                 uint32_t flags = DEFAULT_FLAGS, uint32_t max_queue_size = ROS_TOPIC_QUEUE_BUFFER_SIZE)
         :
         m_topic_name(topic_name),
@@ -152,7 +155,7 @@ public:
         m_publisher_mutex(), 
         m_flags(flags), 
         m_ros_node_thread(), 
-        m_publisher_enabled(false), 
+        m_publisher_enabled(false) 
     {
         /* Set node name */
         bool use_default_name = !is_flag_set(OPTION_FLAG_DEFINE_NODE_NAME);
@@ -163,7 +166,7 @@ public:
         }
         else
         {
-            ASSERT(node_name.size > 0, std::exception); // TODO: make custon exception
+            ASSERT(node_name.size() > 0, std::exception()); // TODO: make custon exception
             m_node_name = node_name;
         }
         
@@ -197,11 +200,11 @@ public:
     *
     * @author          Daniel Greenberger.
     =========================================================*/
-    void Publish(T& msg) // TODO use a reference or copy?
+    void Publish(T& msg) 
     {
-        ASSERT(m_publisher_enabled, std::exception);
+        ASSERT(m_publisher_enabled, std::exception());
         
-        CRITICAL_SECTION
+        ROS_PUBLISHER_CRITICAL_SECTION
         (
             m_queue.push(msg);
             ROS_INTEGRATION_DEBUG_PRINT("publish :: pushing message to back of the queue");
@@ -239,7 +242,7 @@ public:
     =========================================================*/
     void StartPublisher()
     {
-        ASSERT(false == m_publisher_enabled, std::exception); // TODO: add exception
+        ASSERT(false == m_publisher_enabled, std::exception()); // TODO: add exception
         
         ROS_INTEGRATION_DEBUG_PRINT(" StartPublisher :: Starting ROS publisher thread ");
         m_ros_node_thread = std::thread(&RosIntegration::Publisher<T>::__node_main, this);
@@ -301,7 +304,6 @@ private:
     
     
     
-    
     /*=======================================================
     * @brief           Check if the given option flag is set.
     *
@@ -351,7 +353,7 @@ private:
         /* Init ROS node */
         int node_init_arg_counter = 0;
         ros::init(node_init_arg_counter, nullptr, m_node_name);
-        ASSERT(ros::master::check(), std::exception); // Make sure ROS main process is running
+        ASSERT(ros::master::check(), std::exception()); // Make sure ROS main process is running
         ros::NodeHandle node_handler; 
         
         /* Register to publish for topic */
@@ -362,13 +364,13 @@ private:
         
         /* Publish */
         int count = 0;
-        while (ros::ok && m_publisher_enabled)
+        while (_Usually(ros::ok && m_publisher_enabled))
         {
             
             // Pull a message from FIFO
             bool msg_exists = false;
             T msg;
-            CRITICAL_SECTION
+            ROS_PUBLISHER_CRITICAL_SECTION
             (
                 msg_exists = (false == m_queue.empty());
                 if (msg_exists)
@@ -382,7 +384,7 @@ private:
             // Publish
             if (msg_exists)
             {				
-                ROS_INFO("Publishing message: %i", ++count);
+                ROS_INTEGRATION_DEBUG_PRINT("Publishing message: " << ++count);  
                 
                 node_publisher.publish(msg);
                 ros::spinOnce();
@@ -403,7 +405,7 @@ private:
     
 };
 
-#undef ROS_PUBLISHER_CRITICAL_SECTION(code)
+#undef ROS_PUBLISHER_CRITICAL_SECTION
 
 
 }
