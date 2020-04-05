@@ -13,7 +13,7 @@
 	The implementation using a buffer is done is order to minimize the latency on the RaceCar 
     main thread. 
     
-    The only drawback is an increased latency in publishing a single message to ROS. 
+    The drawback is an increased latency in publishing a single message to ROS, since it has to go through the FIFO. 
 */
 
 #ifdef ROS_COMPILATION
@@ -26,13 +26,15 @@
 #include "ros_defs.h"
 
 
+namespace RosIntegration
+{
 
 
 /////////////////////////////////////
 /////           MACROS          /////
 /////////////////////////////////////
 
-// Debug printing
+/* Debug printing */
 #define ROS_INTEGRATION_DEBUG_PRINT_ENABLE (0)  // 0 - Debug printing is OFF, 1 - Debug printing is ON
 
 #if (ROS_INTEGRATION_DEBUG_PRINT_ENABLE == 1)
@@ -46,266 +48,362 @@
 #define ROS_INTEGRATION_DEBUG_PRINT(text)  
 #endif
 
+/*
+         Critical section macro. 
+         Must only be used inside the Publisher class.
+*/
+#define ROS_PUBLISHER_CRITICAL_SECTION(code)   do{  __CRITICAL_SECTION(m_publisher_mutex, code)  } while(0);     
+
+
+////////////////////////////////////////////////////////
+/////           PUBLISHER  CONFIGURATION           /////
+////////////////////////////////////////////////////////
+
+
+/* Default max FIFO capacity */
+constexpr int ROS_TOPIC_QUEUE_BUFFER_SIZE = 1000;
+
+
+/* 
+        Default polling rate 
+        
+        This is the rate in which the FIFO will be checked for new messages
+        to be published to the ROS system.
+*/
+constexpr int ROS_PUBLISH_RATE_PER_SECOND = 10;
 
 
 
-// This must be called from within the Publisher class only
-#define CRITICAL_SECTION(code)       		  \
-	do                               		  \
-	{                                		  \
-		enter_critical_section();    		  \
-		code                         		  \
-		exit_critical_section();     		  \
-	} while(0);
 
+/*
+       Optional flags for publisher class.
+       
+       
+*/
+constexpr int DEFAULT_FLAGS = 0;
 
-
-/////////////////////////////////////
-/////           CLASS           /////
-/////////////////////////////////////
-
-namespace RosIntegration
+typedef enum
 {
-	
-	using std::string;
-
-	constexpr int ROS_TOPIC_QUEUE_BUFFER_SIZE = 1000;
-	constexpr int ROS_PUBLISH_RATE_PER_SECOND = 10;
-	typedef unsigned long int uint_32;
-	
-	constexpr uint_32 __BIT(uint_32 i)
-	{
-		return (1UL << i);
-	}
-	
-	// TODO use enum class and define implicit cast?
-	constexpr int NO_FLAGS = 0;
-	typedef enum
-	{
-		OPTION_FLAG_NO_START_ON_INIT             = __BIT(0), 
-		OPTION_FLAG_DUMP_TO_FILE                 = __BIT(1), 
-		OPTION_FLAG_DEFINE_NODE_NAME             = __BIT(2), 
-	} option_flags_e;
-	
-	
+    OPTION_FLAG_NO_START_ON_INIT             = __BIT(0), 
+    OPTION_FLAG_DEFINE_NODE_NAME             = __BIT(1), 
+   // TODO: implement OPTION_FLAG_DUMP_TO_FILE? Can also use rosbag for output.
+} option_flags_e;
 
 
-	template <typename T>
-	class Publisher
-	{
-	public:
-		Publisher (string topic_name, string node_name = "",  uint_32 flags = NO_FLAGS, uint_32 max_queue_size = ROS_TOPIC_QUEUE_BUFFER_SIZE)
-			:
-            m_topic_name(topic_name),
-			m_node_name(node_name), 
-			m_max_queue_size(),
-			m_queue(), 
-			m_mutex(), 
-			m_flags(flags), 
-			m_ros_thread(), 
-			m_publisher_enabled(false), 
-			m_argc(0)
-		{
-			if (!is_flag_set(OPTION_FLAG_DEFINE_NODE_NAME)) // dgreenbe todo bug, we need to remove "/" from name
-			{
-				m_node_name = "Jetson_Publisher_" + m_topic_name;
-			}
-			
-			// Start Publisher
-			if (!is_flag_set(OPTION_FLAG_NO_START_ON_INIT))
-			{
-				StartPublisher();
-			}
 
-			
-		}
-		
-		// Publish to node
-		void Publish(T& msg) // TODO use a reference or copy?
-		{
-			if (!m_publisher_enabled)
-			{
-				ROS_INTEGRATION_DEBUG_PRINT("publish :: ROS node is not working! ");
-				return;
-			}
-			
-			CRITICAL_SECTION
-			(
-				m_queue.push(msg);
-				ROS_INTEGRATION_DEBUG_PRINT("publish :: pushing message to back of the queue");
-			)
-		}
-		
-		
-		// TODO destructor, needs to call stopPublisher
-		~Publisher()
-		{
-			HaltPublisher();
-		}
+/* ROS node name */
+constexpr string INVALID_NODE_NAME = "";
+constexpr string DEFAULT_NAME_PREFIX = "Jetson_Publisher_";
 
-		
-		// Thread-related
-		void StartPublisher()
-		{
-			if (!m_publisher_enabled)
-			{
-				m_publisher_enabled = true;
-				ROS_INTEGRATION_DEBUG_PRINT(" StartPublisher :: Starting ROS publisher thread ");
-				m_ros_thread = std::thread(&RosIntegration::Publisher<T>::init_ros_publisher_node, this);
-			}
-			else
-			{
-				ROS_INTEGRATION_DEBUG_PRINT(" StartPublisher ::  m_publisher_enabled is already TRUE");
-			}
 
-		}
-		
-		
-		void HaltPublisher()
-		{
-			// Check if publisher is already off
-			if (!m_publisher_enabled)
-			{
-				ROS_INTEGRATION_DEBUG_PRINT("HaltPublisher :: Publisher is already off!");
-				return;
-			}
-			
-			// Mark the thread to stop execution
-			m_publisher_enabled = false;
-			
-			// Wait for the publisher to finish processing current message
-			ROS_INTEGRATION_DEBUG_PRINT("HaltPublisher :: waiting for thread.");
-			m_ros_thread.join();
-			ROS_INTEGRATION_DEBUG_PRINT("HaltPublisher :: Thread has halted.");
-		}
-		
-	private:
 
-		////////////////////////
-		///      Members     ///
-		////////////////////////
-		
-		// FIFO
-		uint_32 m_max_queue_size;
-		std::queue<T> m_queue;
-		
-		
-		// Mutex
-		std::mutex m_mutex;
-		uint_32 m_flags;
-		
-		// Thread
-		std::thread m_ros_thread; // TODO think of better name?
-		bool m_publisher_enabled; // TODO explain this is used as a flag
-		
-		// ROS-related
-		string m_node_name;
-		const string m_topic_name;
-		int m_argc;
-		
-		
-		
-		////////////////////////
-		///      Methods     ///
-		////////////////////////
-		
-		// Getters/Setters 
-		int get_max_buffer_capacity();
-		void set_max_buffer_capacity(int);
-		
-		
-		// Flags
-		bool is_flag_set(option_flags_e flag)
-		{
-			return (m_flags & flag);
-		}
-		
-		
-		
-		
-		void enter_critical_section()
-		{
-			m_mutex.lock();
-			ROS_INTEGRATION_DEBUG_PRINT(" Entered critical section ");
-		}
-		
-		
-		void exit_critical_section()
-		{
-			m_mutex.unlock();
-			ROS_INTEGRATION_DEBUG_PRINT(" Left critical section ");
-		}
-		
-		
-		/*
-			TODO:
-			1. Extend static message to a queue, 
-			2. Make sure to add mutex
-			4. Insert function and queue into a class
-			3. Extend to template
-		*/
 
-		// TODO maybe think of a better name?
-		
-		void init_ros_publisher_node()
-		{
-			/* Init ROS node */
-			ros::init(m_argc, nullptr, m_node_name);
-			_ASSERT(ros::master::check(), todo); // Make sure ROS main process is running
-			ros::NodeHandle node_handler; 
-			
-			/* Register to publish for topic */
-			ros::Publisher node_publisher = node_handler.advertise<T>(m_topic_name, ROS_TOPIC_QUEUE_BUFFER_SIZE);
-			
-			/* Define publish frequency */
-			ros::Rate loop_rate(ROS_PUBLISH_RATE_PER_SECOND);
-			
-			/* Publish */
-			int count = 0;
-			while (ros::ok && m_publisher_enabled)
-			{
-				
-				// Pull a message from FIFO
-				bool msg_exists = false;
-				T msg;
-				CRITICAL_SECTION
-				(
-					msg_exists = (false == m_queue.empty());
-					if (msg_exists)
-					{
-                                                
-						msg = m_queue.front();  
-						m_queue.pop();
-					}
-				)
-				
-				// Publish
-				if (msg_exists)
-				{				
-					// ROS debug print
-					ROS_INFO("Publishing message: %i", ++count);
-					
-					// Publish
-					node_publisher.publish(msg);
-					ros::spinOnce();
-				}
-				
-				// Wait for next publish interval 
-				loop_rate.sleep();
-				
-			}
-			
-			/* Finish node execution */
-			ROS_INFO_STREAM("ROS publisher stop.  Node name: " << m_node_name); 
-			ROS_INTEGRATION_DEBUG_PRINT("ROS publisher stop. ");
-            m_publisher_enabled = false;
-			
-		}
-		
-		
-	};
+////////////////////////////////////////////////
+/////           PUBLISHER  CLASS           /////
+////////////////////////////////////////////////
 
-#undef CRITICAL_SECTION
+
+template <typename T>
+class Publisher
+{
+    
+    
+public:
+
+    /*=======================================================
+    * @brief           Simple constructor for the publisher class
+    *
+    * @description     This is the simplest constructor for the publisher class. 
+    *                  The node name will be auto-generated according to the topic name.
+    *
+    * @param           topic_name       -  Name of the topic for which the messages will be published.
+    *
+    * @param           flags            - (Optional) configuration flags for publisher class.
+    *
+    * @param           max_queue_size   - (Optional) Maximum number of outgoing messages to be queued for delivery to subscribers.
+    *
+    * @author          Daniel Greenberger
+    =========================================================*/
+    Publisher (string topic_name, uint32_t flags = DEFAULT_FLAGS, uint32_t max_queue_size = ROS_TOPIC_QUEUE_BUFFER_SIZE)
+        :
+        Publisher (topic_name, INVALID_NODE_NAME, flags, max_queue_size);
+    {}
+    
+    /*=======================================================
+    * @brief           Constructor for the publisher class allowing to define a custom name for the node.
+    *
+    * @param           topic_name       -  Name of the topic for which the messages will be published.
+    *
+    * @param           node_name       -   Name of the publisher node in the ROS system.
+    *
+    * @param           flags            - (Optional) configuration flags for publisher class.
+    *
+    * @param           max_queue_size   - (Optional) Maximum number of outgoing messages to be queued for delivery to subscribers.
+    *
+    * @author          Daniel Greenberger
+    =========================================================*/
+    Publisher (string topic_name, string node_name = INVALID_NODE_NAME,  
+                uint32_t flags = DEFAULT_FLAGS, uint32_t max_queue_size = ROS_TOPIC_QUEUE_BUFFER_SIZE)
+        :
+        m_topic_name(topic_name),
+        m_node_name(), 
+        m_max_queue_size(),
+        m_queue(), 
+        m_publisher_mutex(), 
+        m_flags(flags), 
+        m_ros_node_thread(), 
+        m_publisher_enabled(false), 
+    {
+        /* Set node name */
+        bool use_default_name = !is_flag_set(OPTION_FLAG_DEFINE_NODE_NAME);
+        
+        if (use_default_name) // TODO: bug, we need to remove "/" from name
+        {
+            m_node_name = DEFAULT_NAME_PREFIX + m_topic_name;
+        }
+        else
+        {
+            ASSERT(node_name.size > 0, std::exception); // TODO: make custon exception
+            m_node_name = node_name;
+        }
+        
+        
+        
+        /* Start Publisher */
+        if (!is_flag_set(OPTION_FLAG_NO_START_ON_INIT))
+        {
+            StartPublisher();
+        }
+
+        
+    }
+    
+    // 
+    
+    /*=======================================================
+    * @brief           Publish a message to the ROS system. 
+    *
+    * @description     This method allows the caller to published a message to the ROS system 
+    *                  on the pre-defined topic of this publisher object. 
+    *                  
+    *                  The message will be copied into the publisher's FIFO, allowing the 
+    *                  calling thread to free its local copy of the message.
+    *
+    * @pre             The publisher thread must be enable (one must call StartPublisher() ).
+    *
+    * @param           msg  -  The message to be published.
+    *
+    * @return          None
+    *
+    * @author          Daniel Greenberger.
+    =========================================================*/
+    void Publish(T& msg) // TODO use a reference or copy?
+    {
+        ASSERT(m_publisher_enabled, std::exception);
+        
+        CRITICAL_SECTION
+        (
+            m_queue.push(msg);
+            ROS_INTEGRATION_DEBUG_PRINT("publish :: pushing message to back of the queue");
+        )
+    }
+    
+    
+    
+    /*=======================================================
+    * @brief           Desctructor for the publisher object.
+    *
+    * @param           None.
+    *
+    * @return          None.
+    *
+    * @author          Daniel Greenberger
+    =========================================================*/
+    ~Publisher()
+    {
+        HaltPublisher();
+    }
+
+    
+    
+    /*=======================================================
+    * @brief           TODO
+    *
+    * @description     TODO
+    *
+    * @param           TODO
+    *
+    * @return          TODO
+    *
+    * @author          TODO
+    =========================================================*/
+    void StartPublisher()
+    {
+        ASSERT(false == m_publisher_enabled, std::exception); // TODO: add exception
+        
+        ROS_INTEGRATION_DEBUG_PRINT(" StartPublisher :: Starting ROS publisher thread ");
+        m_ros_node_thread = std::thread(&RosIntegration::Publisher<T>::__node_main, this);
+        m_publisher_enabled = true;
+    }
+    
+    
+    /*=======================================================
+    * @brief           TODO
+    *
+    * @description     TODO
+    *
+    * @param           TODO
+    *
+    * @return          TODO
+    *
+    * @author          TODO
+    =========================================================*/
+    void HaltPublisher()
+    {
+        // Check if publisher is already off
+        if (!m_publisher_enabled)
+        {
+            ROS_INTEGRATION_DEBUG_PRINT("HaltPublisher :: Publisher is already off!");
+            return;
+        }
+        
+        // Mark the thread to stop execution
+        m_publisher_enabled = false;
+        
+        // Wait for the publisher to finish processing current message
+        ROS_INTEGRATION_DEBUG_PRINT("HaltPublisher :: waiting for thread.");
+        m_ros_node_thread.join();
+        ROS_INTEGRATION_DEBUG_PRINT("HaltPublisher :: Thread has halted.");
+    }
+    
+
+private:
+    
+    // FIFO
+    uint32_t m_max_queue_size;
+    std::queue<T> m_queue;
+    
+    
+    // Mutex
+    std::mutex m_publisher_mutex;
+    
+    // Flags
+    uint32_t m_flags;
+    
+    // Thread
+    std::thread m_ros_node_thread; 
+    bool m_publisher_enabled; 
+    
+    // ROS-related
+    string m_node_name;
+    const string m_topic_name;
+    
+    
+    
+    
+    
+    /*=======================================================
+    * @brief           Check if the given option flag is set.
+    *
+    * @param           flag  -  Option flag to be checked if set.
+    *
+    * @return          TRUE  - The option flag is set for the object.
+    *                  FALSE - The option flag is not set for the object.
+    *
+    * @author          Daniel Greenberger
+    =========================================================*/
+    bool is_flag_set(option_flags_e flag)
+    {
+        return (m_flags & flag);
+    }
+    
+    
+    
+    
+    /*
+        TODO: Make sure that max capacity is enforced somewhere (maybe in the queue itself) or remove from API.
+        
+    */
+
+    
+    
+    /*=======================================================
+    * @brief           Publisher node main function
+    *
+    * @description     This function is where the object interfaces the ROS system. 
+    *                  We are checking the internal object FIFO for new messages. 
+    *                  When a new message exists, it is published to the ROS topic
+    *                  which was pre-defined for this object.
+    *
+    *                  NOTE:
+    *                  While the publisher is enabled, the function works in an infinate loop 
+    *                  and never returns. Therefore, it must be executed on a new thread to not
+    *                  block RaceCar's execution. 
+    *
+    * @param           None.
+    *
+    * @return          None.
+    *
+    * @author          Daniel Greenberger
+    =========================================================*/
+    void __node_main()
+    {
+        /* Init ROS node */
+        int node_init_arg_counter = 0;
+        ros::init(node_init_arg_counter, nullptr, m_node_name);
+        ASSERT(ros::master::check(), std::exception); // Make sure ROS main process is running
+        ros::NodeHandle node_handler; 
+        
+        /* Register to publish for topic */
+        ros::Publisher node_publisher = node_handler.advertise<T>(m_topic_name, m_max_queue_size);
+        
+        /* Define publish frequency */
+        ros::Rate loop_rate(ROS_PUBLISH_RATE_PER_SECOND);
+        
+        /* Publish */
+        int count = 0;
+        while (ros::ok && m_publisher_enabled)
+        {
+            
+            // Pull a message from FIFO
+            bool msg_exists = false;
+            T msg;
+            CRITICAL_SECTION
+            (
+                msg_exists = (false == m_queue.empty());
+                if (msg_exists)
+                {
+                                            
+                    msg = m_queue.front();  
+                    m_queue.pop();
+                }
+            )
+            
+            // Publish
+            if (msg_exists)
+            {				
+                ROS_INFO("Publishing message: %i", ++count);
+                
+                node_publisher.publish(msg);
+                ros::spinOnce();
+            }
+            
+            // Wait for next publish interval 
+            loop_rate.sleep();
+            
+        }
+        
+        /* Finish node execution */
+        ROS_INFO_STREAM("ROS publisher stop.  Node name: " << m_node_name); 
+        ROS_INTEGRATION_DEBUG_PRINT("ROS publisher stop. ");
+        m_publisher_enabled = false;
+        
+    }
+    
+    
+};
+
+#undef ROS_PUBLISHER_CRITICAL_SECTION(code)
 
 
 }
