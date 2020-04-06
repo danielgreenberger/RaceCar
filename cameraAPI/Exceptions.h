@@ -46,6 +46,17 @@ public:
     }
 };
 
+
+class IRealSenseMultipleDev : public IRealSenseExceptions
+{
+public:
+    const char* what() const noexcept override
+    {
+        return "RealSense exception: Multiple Realsense devices were detected, which is unsupported by the implementation";
+    }
+};
+
+
 class IRealSenseInfraRessAndFreqY16 : public IRealSenseExceptions
 {
 public:

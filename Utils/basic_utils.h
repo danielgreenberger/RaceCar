@@ -139,7 +139,7 @@ inline std::string MARK_RED(std::string text)
 ============================================================================*/
 inline std::string MARK_BOLD_BLUE(std::string text)
 {
-    std:string output = text;
+    std::string output = text;
     
     output = FORMAT(DisplayAttributes::Foreground_Blue, output);
     output = FORMAT(DisplayAttributes::Bright, output);

@@ -11,6 +11,8 @@
     #include <fcntl.h>
 #endif
 
+#include "basic_utils.h"
+
 TcpClient::TcpClient() noexcept :
         _socket(-1),
         _address(),

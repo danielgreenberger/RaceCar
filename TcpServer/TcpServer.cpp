@@ -14,6 +14,9 @@
     #include <unistd.h>
 #endif
 
+#include "basic_utils.h"
+
+
 TcpServer::TcpServer() noexcept :
     _ip(""),
     _port(0),

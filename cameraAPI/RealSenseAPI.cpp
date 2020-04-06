@@ -6,6 +6,7 @@
 #include <chrono>
 #include <fstream>
 #include "ros_lib.h"
+#include "basic_utils.h"
 #define NUM_OF_RS_SENSORS 3
 
 //typedef enum rs2_format
@@ -253,7 +254,7 @@ bool RealSense::connectCamera(){
     }
     
 
-    ASSERT((devices.size() == 1);  // Multiple sensors are not supported in this implementation
+    ASSERT(devices.size() == 1, IRealSenseMultipleDev());  // Multiple sensors are not supported in this implementation
     _camera = devices[0];  
 
 

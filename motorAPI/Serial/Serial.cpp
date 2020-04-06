@@ -5,6 +5,7 @@
 
 #include "Serial.h"
 #include "Exceptions.h"
+#include "basic_utils.h"
 
 Serial::Serial() :
     _fd(-1),
