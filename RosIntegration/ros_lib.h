@@ -26,7 +26,7 @@
 /////           MACROS          /////
 /////////////////////////////////////
 
-#define _ASSERT(cond, exception)
+
 
 
 /////////////////////////////////////////
@@ -43,16 +43,18 @@ dgreenbe TODO:
 
 */
 
+#ifndef NO_CAMERA
+    /*=======================================================
+    * @brief           Converts RealSense pointcloud to ROS PointCloud2 message
+    *
+    * @param           pc         -  RealSense point cloud.
+    *
+    * @return          ROS PointCloud2 msg
+    =========================================================*/
+    sensor_msgs::PointCloud2 PointCloudConversion(rs2::points pc);
+    sensor_msgs::PointCloud2 PointCloudConversion(rs2::points pc, const rs2::video_frame color_frame);
 
-/*=======================================================
-* @brief           Converts RealSense pointcloud to ROS PointCloud2 message
-*
-* @param           pc         -  RealSense point cloud.
-*
-* @return          ROS PointCloud2 msg
-=========================================================*/
-sensor_msgs::PointCloud2 PointCloudConversion(rs2::points pc);
-sensor_msgs::PointCloud2 PointCloudConversion(rs2::points pc, const rs2::video_frame color_frame);
+#endif
 
 
 

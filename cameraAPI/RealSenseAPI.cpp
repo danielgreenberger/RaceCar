@@ -1,3 +1,7 @@
+
+
+#ifndef NO_CAMERA
+
 #include "RealSenseAPI.h"
 #include "Exceptions.h"
 #include <iostream>
@@ -801,5 +805,5 @@ Camera::AccelData RealSense::getAccelData()
 
 
 
-
+#endif /* NO_CAMERA */
 

@@ -21,9 +21,42 @@
 #ifndef REALSENSEAPI_H
 #define REALSENSEAPI_H
 
+
+#ifdef NO_CAMERA
+/*
+    In this case, camera functionality is provided by an external driver
+    All camera-related definitions and flows will be redacted at compile-time.
+    
+*/
+
+#define CAMERA_CODE_SECTION(code) 
+#define CAMERA_DEFINITION(text) 
+
+
+#else
+/*
+    Camera is handled by RaceCar internal API (including this file).
+*/
+
+#define CAMERA_CODE_SECTION(code)   \
+	do                              \
+	{                               \
+		code                        \
+	}                               \
+	while(0);
+
+#define CAMERA_DEFINITION(text)    text
+
+
+
+
+
 #include <librealsense2/rs.hpp>
 #include "Camera_types.h"
 #include "ros_lib.h"
+
+
+
 
 class RealSense{
 
@@ -473,5 +506,5 @@ private:
       rs2::decimation_filter decimate;
 
 };
-
+#endif  // NO_CAMERA
 #endif // REALSENSEAPI_H

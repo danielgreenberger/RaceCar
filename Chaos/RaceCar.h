@@ -43,6 +43,11 @@ public:
     };
 
 
+//--------------------------------------------------------------------------
+//                            Main robot functions
+//--------------------------------------------------------------------------
+public:
+
     /**
      * constructor - init. all the classes
      */
@@ -81,13 +86,81 @@ public:
 
 
 
+//--------------------------------------------------------------------------
+//                               Motor functions
+//--------------------------------------------------------------------------
+public:
     /**
-     * stops the Chaos on user demand
+     * makes the car do circles
+     * @return pointer to class
      */
-    bool _is_running;
+    RaceCar &doDonuts();
+    
+    
+private:
+  
+    /**
+     * this function get the control command that the remote user send parse and addapt to
+     * motor/servo of the car and transfer relevant command to (Nano_)Arduino
+     * @param cmd
+     * @return  - none
+     */
+    RaceCar &parseAndSendCmd(const char cmd);
+//--------------------------------------------------------------------------
+//                            Server / Client   functions
+//--------------------------------------------------------------------------
+private:
 
-private: // methods
+    
+    /**
+     * this function will be run on separate thread.
+     * the function run as long as the user didnt stop the program.
+     * first its wait tll the remote user will connect via socket and then
+     * took and process drive commands from remote user.
+     * @return - none
+     */
+    RaceCar &getCarControlCommands();
 
+//--------------------------------------------------------------------------
+//                            Camera functions
+//--------------------------------------------------------------------------
+public:
+
+    /**
+     * @brief setColorToSend
+     * @return
+     */
+    RaceCar &setColorToSend();
+    
+    
+
+    /**
+     * @brief setIRToSend
+     * @return
+     */
+    RaceCar &setIRToSend();
+    
+    
+
+    /**
+     * @brief setDepthToSend
+     * @return
+     */
+    RaceCar &setDepthToSend();
+    
+    
+    
+    /**
+     * this function will be run on separate thread.
+     * the function run as long as the user didnt stop the program and we connected to remote user via socket.
+     * first get data from camera and build packet to send to remote user (with compressed data)
+     * build needed header and then send to remote user.
+     * @return - none
+     */
+    RaceCar &getCameraOutputAndSendToRemote();
+    
+    
+    
     /**
      * @brief setCamAndJpegConfig
      * setup camera ressolution and fps
@@ -97,6 +170,8 @@ private: // methods
      * to remote
      */
     void setCamAndJpegConfig();
+    
+    
     /**
      *  build packet to remote user
      * data compressed with JPEG!
@@ -106,6 +181,8 @@ private: // methods
      * flow (bitcraze) data and compressed image data)
      */
     Chaos::ColorPacket buildColorPacket(const Camera::ColorImage &image);
+    
+    
     
     /**
      * build Color header that need to send before the Color Packer (remote user need to know witch
@@ -135,33 +212,15 @@ private: // methods
     * @return return header to Color Packet
     */
     Chaos::header buildDepthHeader();
-    
-    /**
-     * this function get the control command that the remote user send parse and addapt to
-     * motor/servo of the car and transfer relevant command to (Nano_)Arduino
-     * @param cmd
-     * @return  - none
-     */
-    RaceCar &parseAndSendCmd(const char cmd);
-    
-    /**
-     * this function will be run on separate thread.
-     * the function run as long as the user didnt stop the program.
-     * first its wait tll the remote user will connect via socket and then
-     * took and process drive commands from remote user.
-     * @return - none
-     */
-    RaceCar &getCarControlCommands();
-    
-    /**
-     * this function will be run on separate thread.
-     * the function run as long as the user didnt stop the program and we connected to remote user via socket.
-     * first get data from camera and build packet to send to remote user (with compressed data)
-     * build needed header and then send to remote user.
-     * @return - none
-     */
-    RaceCar &getCameraOutputAndSendToRemote();
-    
+  
+
+
+
+//--------------------------------------------------------------------------
+//                           Bitcraze functions
+//--------------------------------------------------------------------------
+public:
+
     /**
      * this function will be run on separate thread.
      * the function run as long as the user didnt stop the program.
@@ -173,37 +232,35 @@ private: // methods
      */
     RaceCar &getBitCrazeOutput();
 
-    /**
-     * makes the car do circles
-     * @return pointer to class
-     */
-    RaceCar &doDonuts();
+
+
+
+
+
+
+
+
+//--------------------------------------------------------------------------
+//                               members
+//--------------------------------------------------------------------------
+public:
 
     /**
-     * @brief setColorToSend
-     * @return
+     * stops the Chaos on user demand
      */
-    RaceCar &setColorToSend();
-
-    /**
-     * @brief setIRToSend
-     * @return
-     */
-    RaceCar &setIRToSend();
-
-    /**
-     * @brief setDepthToSend
-     * @return
-     */
-    RaceCar &setDepthToSend();
-
-
+    bool _is_running;
+    
+    
+    
 private: //members
     //sensors
     std::shared_ptr<MotorController> _motor_control;
     Bitcraze _bitcraze;
-    RealSense _camera;
-
+    CAMERA_DEFINITION
+    (
+        RealSense _camera;
+    )
+        
     // ROS node
     ROS_DEFINITION
     (
@@ -222,13 +279,20 @@ private: //members
     Flow _flow_data;
 
     //treads
-    std::shared_ptr<std::thread> _camera_thread;
+    CAMERA_DEFINITION
+    (
+        std::shared_ptr<std::thread> _camera_thread;
+    )
     std::shared_ptr<std::thread> _carcontrol_thread;
     std::shared_ptr<std::thread> _bitcraze_thread;
 
     //flags
     bool _is_tcp_client_connected;
-    bool _is_cammera_connected;
+    CAMERA_DEFINITION
+    (
+        bool _is_cammera_connected;
+    )
+    
     bool _is_motor_control_connected;
     bool _is_tcp_server_connected;
     bool _is_bitcraze_connected;

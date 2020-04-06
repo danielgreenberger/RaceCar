@@ -1,6 +1,11 @@
 #ifndef _BASIC_UTILS_H_
 #define _BASIC_UTILS_H_
 
+#include <string>
+#include <iostream>
+#include <fstream>
+
+
 /*
 	@DESCRIPTION
 	
