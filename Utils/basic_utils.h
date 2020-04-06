@@ -55,7 +55,7 @@ namespace TextFormatting
 
 enum DisplayAttributes
 {
-    // Misc
+    /* Misc */
     Reset_all_fornatting  = 0,
     Bright                = 1,
     Dim                   = 2,
@@ -64,7 +64,7 @@ enum DisplayAttributes
     Reverse               = 7,
     Hidden                = 8,
 
-    //	Foreground (text) Colours,
+    /*	Foreground (text) Colors */
     Foreground_Black      = 30,
     Foreground_Red        = 31,
     Foreground_Green      = 32,
@@ -74,7 +74,7 @@ enum DisplayAttributes
     Foreground_Cyan       = 36,
     Foreground_White      = 37,
 
-    //	Background Colours,
+    /*	Background Colors */
     Background_Black      = 40,
     Background_Red        = 41,
     Background_Green      = 42,
@@ -135,11 +135,16 @@ inline std::string MARK_RED(std::string text)
 }
 
 /*==========================================================================
-* @brief           Format input text to be shown as blue in the bash terminal
+* @brief           Format input text to be shown as bold blue in the bash terminal
 ============================================================================*/
-inline std::string MARK_BLUE(std::string text)
-{    
-    return FORMAT(DisplayAttributes::Foreground_Blue, text);
+inline std::string MARK_BOLD_BLUE(std::string text)
+{
+    std:string output = text;
+    
+    output = FORMAT(DisplayAttributes::Foreground_Blue, output);
+    output = FORMAT(DisplayAttributes::Bright, output);
+    
+    return output;
 }
 
 /*==========================================================================
@@ -215,10 +220,10 @@ inline void __ASSERT (const bool condition, const std::exception& e, const char*
         std::cerr << std::endl;
         std::cerr << TextFormatting::MARK_RED("Error: ");
         std::cerr << "Assertation failed at "<< std::endl;
-        std::cerr << TextFormatting::MARK_BLUE("\t file:      ") << assert_file << std::endl;
-        std::cerr << TextFormatting::MARK_BLUE("\t line:      ") << assert_line << std::endl;
-        std::cerr << TextFormatting::MARK_BLUE("\t function:  ") << assert_func << std::endl;
-        std::cerr << TextFormatting::MARK_BLUE("\t condition: ") << assert_text << std::endl;
+        std::cerr << TextFormatting::MARK_BOLD_BLUE("\t file:      ") << assert_file << std::endl;
+        std::cerr << TextFormatting::MARK_BOLD_BLUE("\t line:      ") << assert_line << std::endl;
+        std::cerr << TextFormatting::MARK_BOLD_BLUE("\t function:  ") << assert_func << std::endl;
+        std::cerr << TextFormatting::MARK_BOLD_BLUE("\t condition: ") << assert_text << std::endl;
         
 
         // Throw the exception
