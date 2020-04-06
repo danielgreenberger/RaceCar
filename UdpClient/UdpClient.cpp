@@ -62,10 +62,7 @@ UdpClient &UdpClient::createSocket()
 {
     _socket = socket(AF_INET, SOCK_DGRAM, 0);
 
-    if(_socket < 0)
-    {
-        throw UDPClientCannotCreateSocket();
-    }
+    ASSERT(_socket >= 0, UDPClientCannotCreateSocket());
 
     return *this;
 }

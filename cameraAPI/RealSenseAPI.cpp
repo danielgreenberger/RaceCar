@@ -252,18 +252,16 @@ bool RealSense::connectCamera(){
         return false;
     }
     
-    // dgreenbe TODO 
-    // what to do for multiple devices? maybe print warning, throw an exception. To prevent silently fail bugs
+
+    ASSERT((devices.size() == 1);  // Multiple sensors are not supported in this implementation
     _camera = devices[0];  
 
 
     /* Detect device sensors */
     std::vector<rs2::sensor> sensors = devices[0].query_sensors();
-    if (sensors.size() < NUM_OF_RS_SENSORS){
-        throw IRealSenseColorRessAndFreq();
-    }
+    ASSERT(sensors.size() == NUM_OF_RS_SENSORS, IRealSenseColorRessAndFreq());
 
-   _stereo_module = sensors[0]; // dgreenbe TODO, how do we know this is the right indexes?
+   _stereo_module = sensors[0]; 
    _rgb_camera = sensors[1];
    _motion_module = sensors[2];
 
@@ -309,7 +307,7 @@ void RealSense::setupColorImage(RealSense::ColorFrameFormat format,
             ((ressolution == ColorRessolution::R_320x180   || ressolution ==ColorRessolution::R_320x240)   && fps == ColorCamFps::F_15hz) 
       )
     {
-        throw IRealSenseColorRessAndFreq();
+        ASSERT(false, IRealSenseColorRessAndFreq());
     }
     
     /* Convert to librealsense2 data types  */
@@ -340,7 +338,7 @@ void RealSense::setupInfraredImage(RealSense::InfrarFrameFormat format, RealSens
         !(fps == InfrarCamFps::F_30hz || fps == InfrarCamFps::F_25hz || fps == InfrarCamFps::F_15hz)
       )
     {
-        throw IRealSenseInfraRessAndFreq();
+        ASSERT(false, IRealSenseInfraRessAndFreq());
     }
     
     /* Check for unsupported format and rate combinations */
@@ -349,7 +347,7 @@ void RealSense::setupInfraredImage(RealSense::InfrarFrameFormat format, RealSens
             !(fps == InfrarCamFps::F_25hz || fps == InfrarCamFps::F_15hz)
         )
     {
-        throw IRealSenseInfraRessAndFreqY16();
+        ASSERT(false, IRealSenseInfraRessAndFreqY16());
     }
     
     /* Convert to librealsense2 data types  */
@@ -378,7 +376,7 @@ void RealSense::setupDepthImage(RealSense::DepthRessolution ressolution, RealSen
     /* Check for unsupported resolution and rate combinations */
     if(ressolution == DepthRessolution::R_1280x720 && (fps == DepthCamFps::F_90hz || fps == DepthCamFps::F_60hz))
     {
-        throw IRealSenseDepthRessAndFreq();
+        ASSERT(false, IRealSenseDepthRessAndFreq());
     }
     
     /* Convert to librealsense2 data types  */
@@ -443,9 +441,7 @@ Camera::ColorImage RealSense::getColorImage()
 {
     /* Extract frame from buffer */
     rs2::video_frame color_frame = _frames.get_color_frame();
-    if (!color_frame){
-        throw IRealSenseBadSettingUse();
-    }
+    ASSERT((bool) color_frame, IRealSenseBadSettingUse());
     
     /* Get current Jetson timestamp */
     auto time_stamp = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -483,10 +479,7 @@ Camera::ColorImage RealSense::getInfraredImage()
     /* Extract frame from buffer */
     rs2::video_frame infrared_frame = _frames.get_infrared_frame();
     
-    if (!infrared_frame)
-    {
-        throw IRealSenseBadSettingUse();
-    }
+    ASSERT((bool) infrared_frame, IRealSenseBadSettingUse());
    
    
     /* Get current Jetson timestamp */
@@ -522,9 +515,7 @@ Camera::DepthImage RealSense::getDepthImage()
     /* Extract frame from buffer */
     rs2::video_frame depth_frame = _frames.get_depth_frame();
 
-    if (!depth_frame){
-        throw IRealSenseBadSettingUse();
-    }
+    ASSERT( (bool) depth_frame, IRealSenseBadSettingUse());
 
     /* Get current Jetson timestamp */
     auto time_stamp = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -563,9 +554,7 @@ Camera::ColorImage RealSense::getDepthColorizedImage()
 {
 
         rs2::frame depth_frame =  _frames.first(RS2_STREAM_DEPTH);
-        if (!depth_frame){
-            throw IRealSenseBadSettingUse();
-        }
+        ASSERT( (bool) depth_frame, IRealSenseBadSettingUse());
 
         auto time_stamp = std::chrono::high_resolution_clock::now().time_since_epoch();
         auto host_time_stamp_ms = std::chrono::duration_cast<std::chrono::milliseconds>(time_stamp).count();
@@ -605,9 +594,7 @@ rs2::points RealSense::getPointCloud()
     /* Extract depth frame from buffer */
     auto depth_frame = _frames.get_depth_frame();
 
-    if (!depth_frame){
-        throw IRealSenseBadSettingUse();
-    }
+    ASSERT( (bool) depth_frame, IRealSenseBadSettingUse());
     
     /* Convert to pointcloud */
     auto pc = std::make_shared<rs2::pointcloud>();
@@ -628,10 +615,7 @@ rs2::points RealSense::getColorPointCloud()
     auto depth_frame = _frames.get_depth_frame();
     auto color_frame = _frames.get_color_frame();
 
-    if (!depth_frame || !color_frame)
-    {
-        throw IRealSenseBadSettingUse();
-    }
+    ASSERT(  ((bool) depth_frame) && ((bool) color_frame)  , IRealSenseBadSettingUse());
     
     /* Convert to pointcloud */
     auto pc = std::make_shared<rs2::pointcloud>();
@@ -657,10 +641,7 @@ sensor_msgs::PointCloud2 RealSense::getROSPointCloud2()
     auto depth_frame = _frames.get_depth_frame();
     auto color_frame = _frames.get_color_frame();
 
-    if (!depth_frame || !color_frame)
-    {
-        throw IRealSenseBadSettingUse();
-    }
+    ASSERT(  ((bool) depth_frame) && ((bool) color_frame) , IRealSenseBadSettingUse());
     
     /* Convert to pointcloud */
     auto pc = std::make_shared<rs2::pointcloud>();

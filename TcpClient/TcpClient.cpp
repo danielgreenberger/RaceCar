@@ -48,10 +48,7 @@ TcpClient &TcpClient::createSocket()
 {
     _socket = socket(AF_INET, SOCK_STREAM, 0);
 
-    if(_socket == -1)
-    {
-        throw ITcpClientCannotCreateSocket();
-    }
+    ASSERT((_socket != -1), ITcpClientCannotCreateSocket());
 
     return *this;
 }

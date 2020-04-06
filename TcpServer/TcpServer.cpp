@@ -33,10 +33,7 @@ TcpServer &TcpServer::createSocket()
 {
     _socket = socket(AF_INET, SOCK_STREAM, 0);
 
-    if(_socket == -1)
-    {
-        throw ITcpServerCannotCreateSocket();
-    }
+    ASSERT(_socket != -1, ITcpServerCannotCreateSocket());
 
     int flags = fcntl(_socket, F_GETFL);
     fcntl(_socket, F_SETFL, flags | O_NONBLOCK);
@@ -62,10 +59,7 @@ TcpServer &TcpServer::doBind()
 TcpServer &TcpServer::doListen()
 {
     int res = listen(_socket, _max_num_of_clients);
-    if(res < 0)
-    {
-        throw ITcpServerCannotListen();
-    }
+    ASSERT(res >= 0, ITcpServerCannotListen());
 
     return *this;
 }

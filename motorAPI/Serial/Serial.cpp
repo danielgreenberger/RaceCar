@@ -17,10 +17,7 @@ Serial &Serial::connect(const string &path)
 {
     _path = path;
     _fd = open(_path.data(), O_RDWR | O_NOCTTY | O_NDELAY);
-    if(_fd < 0)
-    {
-        throw SerialCannotBeOpened(_path);
-    }
+    ASSERT(_fd >= 0, SerialCannotBeOpened(_path));
 
     struct termios config;
 
@@ -46,10 +43,8 @@ Serial &Serial::write(const string &msg)
 {
     auto bytes_written = ::write(_fd, msg.data(), msg.size());
 
-    if(bytes_written < 0)
-    {
-        throw SerialCannotWrite();
-    }
+    ASSERT(bytes_written >= 0, SerialCannotWrite());
+    
 
     return *this;
 }
@@ -59,10 +54,7 @@ string Serial::read(const uint &len)
     std::vector<char> rec(len);
     auto bytes_recieved = ::read(_fd, rec.data(), len);
 
-    if(bytes_recieved < 0)
-    {
-        throw SerialCannotRead();
-    }
+    ASSERT(bytes_recieved >= 0, SerialCannotRead());
 
     return string(rec.data());
 }

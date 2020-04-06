@@ -4,7 +4,7 @@
 /*
 	@DESCRIPTION
 	
-	TODO
+	This file includes some basic utilities which can be usefull in the entire project. 
 */
 
 
@@ -25,7 +25,7 @@
 *                  These macros can be used to optimize performence when the value of a boolean
 *                  condition is almost always the same value. 
 *
-* @param           x  -  A boolean condition
+* @param           x  -  A boolean condition (or an integer expression to be evaluated as boolean)
 *
 * @return          The same value as x. 
 *
@@ -37,6 +37,84 @@
 
 
 
+////////////////////////////////////////////////
+/////            STANDARD OUTPUT           /////
+////////////////////////////////////////////////
+namespace TextFormatting
+{
+
+/*
+    Formatting options. 
+    
+    For more info visit:
+    https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+    http://www.termsys.demon.co.uk/vtansi.htm#colors
+
+*/
+enum TextColor
+{
+    Black   = 30,
+    Red     = 31,
+    Green   = 32,
+    Yellow  = 33,
+    Blue    = 34,
+    Magenta = 35,
+    Cyan    = 36,
+    White   = 37
+};
+
+
+/*
+    Meta strings for bash formats parsing
+*/
+const std::string FORMAT_BEGIN_STR = "\033[";
+const std::string FORMAT_END_STR = "m";
+
+
+/*=======================================================
+* @brief           Begin text formatting
+=========================================================*/
+inline std::string BASH_FORMATTING_BEGIN(int attribute_val)
+{
+    return FORMAT_BEGIN_STR + std::to_string(attribute_val) + FORMAT_END_STR;
+}
+
+/*=======================================================
+* @brief           End text formatting
+=========================================================*/
+inline std::string BASH_FORMATTING_END()
+{
+    return FORMAT_BEGIN_STR + FORMAT_END_STR;
+}
+
+/*=======================================================
+* @brief           Format text
+=========================================================*/
+inline std::string FORMAT(TextColor color, std::string text)
+{    
+    return BASH_FORMATTING_BEGIN(color) + text + BASH_FORMATTING_END();
+}
+
+
+
+/*==========================================================================
+* @brief           Format input text to be shown as red in the bash terminal
+============================================================================*/
+inline std::string MARK_RED(std::string text)
+{    
+    return FORMAT(TextColor::Red, text);
+}
+
+/*==========================================================================
+* @brief           Format input text to be shown as red in the bash terminal
+============================================================================*/
+inline std::string MARK_BLUE(std::string text)
+{    
+    return FORMAT(TextColor::Blue, text);
+}
+
+
+} // namespace TextFormatting
 ////////////////////////////////////////////////
 /////          ASSERT & EXCEPTIONS         /////
 ////////////////////////////////////////////////
@@ -61,7 +139,7 @@
 do                                                                                                                    \
 {                                                                                                                     \
     const char* condition_string = #condition;                                                                        \
-    __ASSERT((condition), (exception), __FILE__, __LINE__, __PRETTY_FUNCTION__, (const char*) condition_string);      \
+    __ASSERT((condition), (exception), __FILE__, __LINE__, __PRETTY_FUNCTION__, condition_string);                    \
 }                                                                                                                     \
 while(0);                                                                                                             
 
@@ -96,9 +174,17 @@ inline void __ASSERT (const bool condition, const std::exception& e, const char*
 {
     if (_Rarely(!condition))
     {
-        std::cerr << "\r\nAssertation failed at " << assert_func;
-        std::cerr << "(" << assert_file << ":" << assert_line <<"):   \r\n";
-        std::cerr << assert_text << std::endl;
+        // Print message to standard error output
+        std::cerr << std::endl;
+        std::cerr << TextFormatting::MARK_RED("Error: ");
+        std::cerr << "Assertation failed at "<< std::endl;
+        std::cerr << TextFormatting::MARK_BLUE("\t file:      ") << assert_file << std::endl;
+        std::cerr << TextFormatting::MARK_BLUE("\t line:      ") << assert_line << std::endl;
+        std::cerr << TextFormatting::MARK_BLUE("\t function:  ") << assert_func << std::endl;
+        std::cerr << TextFormatting::MARK_BLUE("\t condition: ") << assert_text << std::endl;
+        
+
+        // Throw the exception
         throw e;
     }
 }

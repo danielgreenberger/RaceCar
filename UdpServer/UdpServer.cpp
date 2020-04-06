@@ -14,10 +14,7 @@ UdpServer &UdpServer::createSocket()
 {
     _socket = socket(AF_INET, SOCK_DGRAM, 0);
 
-    if(_socket < 0)
-    {
-        throw UDPServerCannotCreateSocket();
-    }
+    ASSERT(_socket >= 0, UDPServerCannotCreateSocket());
 
     return *this;
 }
@@ -31,10 +28,7 @@ UdpServer &UdpServer::bind(const string &ip, const ushort &port)
 
     auto res = ::bind(_socket, reinterpret_cast<sockaddr*>(&server_address), sizeof (server_address));
 
-    if(res < 0)
-    {
-        throw UDPServerCannotBind(ip, port);
-    }
+    ASSERT(res >= 0, UDPServerCannotBind(ip, port))
 
     return *this;
 }
@@ -66,20 +60,14 @@ void UdpServer::receive(char *dst, const unsigned long &len)
 
 void UdpServer::send(const std::vector<char> &data)
 {
-    if(_client_address.sin_port == 0)
-    {
-        throw UDPServerNoClientAddress();
-    }
+    ASSERT(_client_address.sin_port != 0, UDPServerNoClientAddress());
 
     sendto(_socket, data.data(), data.size(), 0, reinterpret_cast<sockaddr*>(&_client_address), sizeof(_client_address));
 }
 
 void UdpServer::send(const string &msg)
 {
-    if(_client_address.sin_port == 0)
-    {
-        throw UDPServerNoClientAddress();
-    }
+    ASSERT(_client_address.sin_port != 0, UDPServerNoClientAddress());
 
     sendto(_socket, msg.data(), msg.size(), 0, reinterpret_cast<sockaddr*>(&_client_address), sizeof(_client_address));
 }

@@ -26,6 +26,16 @@ public:
     }
 };
 
+class IRealSenseMultipleSensors : public IRealSenseExceptions
+{
+public:
+    const char* what() const noexcept override
+    {
+        return "RealSense exception: Multiple sensors were detected, which is not supported by the current implementation";
+    }
+};
+
+
 
 class IRealSenseColorRessAndFreq : public IRealSenseExceptions
 {
