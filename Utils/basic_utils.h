@@ -4,14 +4,14 @@
 /*
 	@DESCRIPTION
 	
-	This file includes some basic utilities which can be usefull in the entire project. 
+	This file includes some basic utilities which can be usefull across the entire project. 
 */
 
 
 
-////////////////////////////////////////////////
-/////         PROCESSOR OPTIMIZATION       /////
-////////////////////////////////////////////////
+///////////////////////////////////////////////////
+/////         PROCESSOR && OPTIMIZATION       /////
+///////////////////////////////////////////////////
 
 
 /*=======================================================
@@ -44,23 +44,45 @@ namespace TextFormatting
 {
 
 /*
-    Formatting options. 
+    Text formatting options for output terminals supporting the ANSI standard (i.e Bash). 
     
     For more info visit:
     https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
     http://www.termsys.demon.co.uk/vtansi.htm#colors
 
 */
-enum TextColor
+
+
+enum DisplayAttributes
 {
-    Black   = 30,
-    Red     = 31,
-    Green   = 32,
-    Yellow  = 33,
-    Blue    = 34,
-    Magenta = 35,
-    Cyan    = 36,
-    White   = 37
+    // Misc
+    Reset_all_fornatting  = 0,
+    Bright                = 1,
+    Dim                   = 2,
+    Underscore            = 4,
+    Blink                 = 5,
+    Reverse               = 7,
+    Hidden                = 8,
+
+    //	Foreground (text) Colours,
+    Foreground_Black      = 30,
+    Foreground_Red        = 31,
+    Foreground_Green      = 32,
+    Foreground_Yellow     = 33,
+    Foreground_Blue       = 34,
+    Foreground_Magenta    = 35,
+    Foreground_Cyan       = 36,
+    Foreground_White      = 37,
+
+    //	Background Colours,
+    Background_Black      = 40,
+    Background_Red        = 41,
+    Background_Green      = 42,
+    Background_Yellow     = 43,
+    Background_Blue       = 44,
+    Background_Magenta    = 45,
+    Background_Cyan       = 46,
+    Background_White      = 47,
 };
 
 
@@ -90,10 +112,17 @@ inline std::string BASH_FORMATTING_END()
 /*=======================================================
 * @brief           Format text
 =========================================================*/
-inline std::string FORMAT(TextColor color, std::string text)
+inline std::string FORMAT(DisplayAttributes att, std::string text)
 {    
-    return BASH_FORMATTING_BEGIN(color) + text + BASH_FORMATTING_END();
+    return BASH_FORMATTING_BEGIN(att) + text + BASH_FORMATTING_END();
 }
+
+
+/*
+    The following functions are example uses of the formatting function
+    for common cases. 
+*/
+
 
 
 
@@ -102,15 +131,23 @@ inline std::string FORMAT(TextColor color, std::string text)
 ============================================================================*/
 inline std::string MARK_RED(std::string text)
 {    
-    return FORMAT(TextColor::Red, text);
+    return FORMAT(DisplayAttributes::Foreground_Red, text);
 }
 
 /*==========================================================================
-* @brief           Format input text to be shown as red in the bash terminal
+* @brief           Format input text to be shown as blue in the bash terminal
 ============================================================================*/
 inline std::string MARK_BLUE(std::string text)
 {    
-    return FORMAT(TextColor::Blue, text);
+    return FORMAT(DisplayAttributes::Foreground_Blue, text);
+}
+
+/*==========================================================================
+* @brief           Format input text to be shown with bottom underscore
+============================================================================*/
+inline std::string MARK_UNDERSCORE(std::string text)
+{    
+    return FORMAT(DisplayAttributes::Underscore, text);
 }
 
 
