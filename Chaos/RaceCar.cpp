@@ -59,8 +59,7 @@ RaceCar::RaceCar()
 	ROS_CODE_SECTION
 	(
        std::cout << "Init publishers" <<std::endl;
-		m_publisher_1_p = std::make_shared<RosIntegration::Publisher<std_msgs::String>> ("pub_1", "node_1", RosIntegration::OPTION_FLAG_DEFINE_NODE_NAME);
-		m_publisher_point_cloud = std::make_shared<RosIntegration::Publisher<sensor_msgs::PointCloud2>> ("pointcloud", "pointcloud", RosIntegration::OPTION_FLAG_DEFINE_NODE_NAME);
+		_publisher_1_p = std::make_shared<RosIntegration::Publisher<std_msgs::String>> ("daniel_g");
 	)
 
 }

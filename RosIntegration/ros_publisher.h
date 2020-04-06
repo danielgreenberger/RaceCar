@@ -192,7 +192,7 @@ public:
     *                  The message will be copied into the publisher's FIFO, allowing the 
     *                  calling thread to free its local copy of the message.
     *
-    * @pre             The publisher thread must be enable (one must call StartPublisher() ).
+    * @pre             The publisher thread must be enabled (one must call StartPublisher() ).
     *
     * @param           msg  -  The message to be published.
     *
@@ -370,12 +370,13 @@ private:
             // Pull a message from FIFO
             bool msg_exists = false;
             T msg;
+            
             ROS_PUBLISHER_CRITICAL_SECTION
             (
                 msg_exists = (false == m_queue.empty());
+
                 if (msg_exists)
-                {
-                                            
+                {                     
                     msg = m_queue.front();  
                     m_queue.pop();
                 }

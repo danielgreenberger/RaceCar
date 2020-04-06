@@ -264,9 +264,7 @@ private: //members
     // ROS node
     ROS_DEFINITION
     (
-        std::shared_ptr<RosIntegration::Publisher<std_msgs::String>> m_publisher_1_p;
-        std::shared_ptr<RosIntegration::Publisher<sensor_msgs::PointCloud2>> m_publisher_point_cloud;
-		int m_msg_counter;
+        std::shared_ptr<RosIntegration::Publisher<std_msgs::String>> _publisher_1_p;
     )
 
     //communication
