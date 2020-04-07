@@ -129,9 +129,7 @@ typedef enum : uint32_t
     OPTION_FLAG_ASSERT_ON_MAX_CAPACITY       = __BIT(2),  
     OPTION_FLAG_WARN_ON_MAX_CAPACITY         = __BIT(3),  
     OPTION_FLAG_OVERRIDE_MAX_CAPACITY        = __BIT(4),  
-    
-    
-
+       
     OPTION_FLAG_MAX                          = __BIT(31), 
    // TODO: implement OPTION_FLAG_DUMP_TO_FILE? Can also use rosbag for output.
 } option_flags_e;
@@ -259,7 +257,7 @@ public:
         /* Start Publisher */
         if (!is_flag_set(OPTION_FLAG_NO_START_ON_INIT))
         {
-            StartPublisher();
+            start();
         }
 
         
@@ -276,7 +274,7 @@ public:
     *                  The message will be copied into the publisher's FIFO, allowing the 
     *                  calling thread to free its local copy of the message.
     *
-    * @pre             The publisher thread must be enabled (one must call StartPublisher() ).
+    * @pre             The publisher thread must be enabled (one must call start() ).
     *
     * @param           msg  -  The message to be published.
     *
@@ -326,7 +324,7 @@ public:
     =========================================================*/
     ~Publisher()
     {
-        HaltPublisher();
+        stop();
     }
 
     
@@ -342,11 +340,11 @@ public:
     *
     * @author          TODO
     =========================================================*/
-    void StartPublisher()
+    void start()
     {
         ASSERT(false == m_publisher_enabled, std::exception()); // TODO: add exception
         
-        ROS_INTEGRATION_DEBUG_PRINT(" StartPublisher :: Starting ROS publisher thread ");
+        ROS_INTEGRATION_DEBUG_PRINT(" start :: Starting ROS publisher thread ");
         m_ros_node_thread = std::thread(&RosIntegration::Publisher<T>::__node_main, this);
         m_publisher_enabled = true;
     }
@@ -363,12 +361,12 @@ public:
     *
     * @author          TODO
     =========================================================*/
-    void HaltPublisher()
+    void stop()
     {
         // Check if publisher is already off
         if (!m_publisher_enabled)
         {
-            ROS_INTEGRATION_DEBUG_PRINT("HaltPublisher :: Publisher is already off!");
+            ROS_INTEGRATION_DEBUG_PRINT("stop :: Publisher is already off!");
             return;
         }
         
@@ -376,9 +374,9 @@ public:
         m_publisher_enabled = false;
         
         // Wait for the publisher to finish processing current message
-        ROS_INTEGRATION_DEBUG_PRINT("HaltPublisher :: waiting for thread.");
+        ROS_INTEGRATION_DEBUG_PRINT("stop :: waiting for thread.");
         m_ros_node_thread.join();
-        ROS_INTEGRATION_DEBUG_PRINT("HaltPublisher :: Thread has halted.");
+        ROS_INTEGRATION_DEBUG_PRINT("stop :: Thread has halted.");
     }
     
 

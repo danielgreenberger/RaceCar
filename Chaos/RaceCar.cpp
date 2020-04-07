@@ -77,6 +77,8 @@ RaceCar::~RaceCar()
              std::cout << "camera destruction finished" <<std::endl;
          }
     )
+
+        
     if (_carcontrol_thread){
         std::cout << "serial destructor" <<std::endl;
         _motor_control->stop();
@@ -84,6 +86,7 @@ RaceCar::~RaceCar()
         _carcontrol_thread->join();
         std::cout << "seial destruction finished" <<std::endl;
      }
+    
     if (_bitcraze_thread){
         std::cout << "bitcraze destructor" <<std::endl;
 
