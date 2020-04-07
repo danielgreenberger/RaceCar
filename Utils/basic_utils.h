@@ -18,7 +18,7 @@
 /////         PROCESSOR && OPTIMIZATION       /////
 ///////////////////////////////////////////////////
 
-
+#ifdef __GNUC__
 /*=======================================================
 * @brief           Optimization macros for better branch predition
 *
@@ -39,12 +39,22 @@
 #define _Usually(x)      __builtin_expect(!!(x), 1) 
 #define _Rarely(x)    __builtin_expect(!!(x), 0) 
 
+#else
+
+
+#warning "Macros _Usually and _Rarely are only supported for GCC compilers. "    
+
+#define _Usually(x)      (x)
+#define _Rarely(x)    (x)
+
+#endif
 
 
 
 ////////////////////////////////////////////////
 /////            STANDARD OUTPUT           /////
 ////////////////////////////////////////////////
+
 namespace TextFormatting
 {
 
@@ -211,7 +221,7 @@ while(0);
 *                                
 * @param           assert_line   -  The line in assert_file file where the condition was asserted.
 *                                
-* @param           assert_func   -  The function is which the condition was asserted.
+* @param           assert_func   -  The function in which the condition was asserted.
 *                                
 * @param           assert_text   -  A string describing the condition.
 *
@@ -260,7 +270,6 @@ constexpr uint32_t __BIT(int i)
 {
     return (1UL << i);
 }
-
 
 
 

@@ -137,9 +137,10 @@ typedef enum : uint32_t
 } option_flags_e;
 
 
-
-
 const int DEFAULT_FLAGS = OPTION_FLAG_WARN_ON_MAX_CAPACITY;
+
+
+
 
 //--------------------------------------------------------------------------
 //                              ROS node name
