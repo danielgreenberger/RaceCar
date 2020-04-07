@@ -301,7 +301,7 @@ constexpr uint32_t __BIT(int i)
 * @author          Daniel Greenberger
 =========================================================*/
 #define __CRITICAL_SECTION(mutex, code)     do{   mutex.lock();  code;   mutex.unlock();    } while(0);
-
+// TODO: use c++ std acquire lock instead of bare lock/unlock
 /*
     This is an example wrapper for the critical section macro. 
     DO NOT USE THIS MACRO DIRECTLY. 

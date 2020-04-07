@@ -129,7 +129,7 @@ typedef enum : uint32_t
     OPTION_FLAG_ASSERT_ON_MAX_CAPACITY       = __BIT(2),  
     OPTION_FLAG_WARN_ON_MAX_CAPACITY         = __BIT(3),  
     OPTION_FLAG_OVERRIDE_MAX_CAPACITY        = __BIT(4),  
-       
+        
     OPTION_FLAG_MAX                          = __BIT(31), 
    // TODO: implement OPTION_FLAG_DUMP_TO_FILE? Can also use rosbag for output.
 } option_flags_e;
@@ -345,8 +345,8 @@ public:
         ASSERT(false == m_publisher_enabled, std::exception()); // TODO: add exception
         
         ROS_INTEGRATION_DEBUG_PRINT(" start :: Starting ROS publisher thread ");
-        m_ros_node_thread = std::thread(&RosIntegration::Publisher<T>::__node_main, this);
         m_publisher_enabled = true;
+        m_ros_node_thread = std::thread(&RosIntegration::Publisher<T>::__node_main, this);
     }
     
     
@@ -383,7 +383,7 @@ public:
 
 
 //--------------------------------------------------------------------------
-//                             Misc functions
+//                             Option flags functions
 //--------------------------------------------------------------------------
 private:    
     
@@ -427,31 +427,25 @@ private:
     
 
 //--------------------------------------------------------------------------
-//                           Publisher node functions
+//                           Publisher node infrastructure
 //--------------------------------------------------------------------------
     
 private:    
-    
-    
-    
-    /*
-        TODO: Make sure that max capacity is enforced somewhere (maybe in the queue itself) or remove from API.
-        
-    */
-
-    
+      
     
     /*=======================================================
     * @brief           Publisher node main function
     *
-    * @description     This function is where the object interfaces the ROS system. 
-    *                  We are checking the internal object FIFO for new messages. 
-    *                  When a new message exists, it is published to the ROS topic
-    *                  which was pre-defined for this object.
+    * @description     This function is where the object interfaces the ROS system, 
+    *                  and is a wrapper for all the internal publisher logic within ROS, 
+    *                  which may be overriden by inheritance. 
+    *                  
+    *                  This is where the publisher is registers as a new node in ROS.
+    *                  The node is destroyed when the function returns.
     *
     *                  NOTE:
-    *                  While the publisher is enabled, the function works in an infinate loop 
-    *                  and never returns. Therefore, it must be executed on a new thread to not
+    *                  While the publisher is enabled, the function calls an infinate loop 
+    *                  for the internal publisher. Therefore, it must be executed on a new thread to not
     *                  block RaceCar's execution. 
     *
     * @param           None.
@@ -468,43 +462,8 @@ private:
         ASSERT(ros::master::check(), std::exception()); // Make sure ROS main process is running
         ros::NodeHandle node_handler; 
 
-        
-        
-        /* Register to publish for topic */
-        ros::Publisher node_publisher = node_handler.advertise<T>(m_topic_name, m_max_queue_size);
-
-        
-        
-        /* Define publish frequency */
-        ros::Rate loop_rate(ROS_PUBLISH_RATE_PER_SECOND);
-
-        
-        
-        /* Publish */
-        int count = 0;
-        while (_Usually(ros::ok && m_publisher_enabled))
-        {
-            
-            // Pull a message from FIFO
-            T msg;
-            bool msg_exists = pull_message_if_exists(msg);
-            
-                
-            // Publish
-            if (msg_exists)
-            {				
-                ROS_INTEGRATION_DEBUG_PRINT("Publishing message: " << ++count);  
-                
-                node_publisher.publish(msg);
-                ros::spinOnce();
-            }
-
-
-            // Wait for next publish interval 
-            loop_rate.sleep();
-            
-        }
-
+        /* Enter main publisher loop */
+        __publisher_loop(node_handler);
 
         
         /* Finish node execution */
@@ -514,8 +473,32 @@ private:
         
     }
     
+protected:    
+    /*=======================================================
+    * @brief           Check if the publisher is active
+    *
+    * @description     This function is intended to be used by the publisher main
+    *                  loop for its halting condition. 
+    *
+    * @return          TRUE   -  The publisher is active
+    *                  FALSE  -  The publisher is not active
+    *
+    * @author          Daniel Greenberger
+    =========================================================*/
+    bool publisher_active() // TODO: maybe name it can_publish()?
+    {
+        return _Usually(m_publisher_enabled && ros::ok );
+    }
     
+
+
+
+
+//--------------------------------------------------------------------------
+//                              FIFO   functions 
+//--------------------------------------------------------------------------
     
+protected:    
     
     /*=======================================================
     * @brief           Pull a message from the FIFO
@@ -548,6 +531,69 @@ private:
         
         return msg_exists;
     }
+
+    
+
+//---------------------------------------------------------------------------------------------
+//                           Internal Publisher functions (can be overriden by derived class)
+//---------------------------------------------------------------------------------------------
+        
+        
+    /*=======================================================
+    * @brief           Publisher node main function
+    *
+    * @description     This function works in an infinate loop while the publisher is active. 
+    *                  We are checking the internal object FIFO for new messages. 
+    *                  When a new message exists, it is published to the ROS topic
+    *                  which was pre-defined for this object.
+    *
+    *
+    * @param           node_handler  -  This is the access point to the node functionality. 
+    *
+    * @return          None.
+    *
+    * @author          Daniel Greenberger
+    =========================================================*/
+    void __publisher_loop(ros::NodeHandle& node_handler)
+    {
+        
+        /* Register to publish for topic */
+        ros::Publisher node_publisher = node_handler.advertise<T>(m_topic_name, m_max_queue_size);
+
+        
+        
+        /* Define publish frequency */
+        ros::Rate loop_rate(ROS_PUBLISH_RATE_PER_SECOND);
+
+        
+        
+        /* Publish */
+        int count = 0;
+        while ( publisher_active() )
+        {
+            
+            // Pull a message from FIFO
+            T msg;
+            bool msg_exists = pull_message_if_exists(msg);
+            
+                
+            // Publish
+            if (msg_exists)
+            {				
+                ROS_INTEGRATION_DEBUG_PRINT("Publishing message: " << ++count);  
+                
+                node_publisher.publish(msg);
+                ros::spinOnce();
+            }
+
+
+            // Wait for next publish interval 
+            loop_rate.sleep();
+            
+        }
+        
+    }
+
 
     
     
