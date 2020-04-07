@@ -261,7 +261,7 @@ private: //members
         RealSense _camera;
     )
         
-    // ROS node
+    // ROS Publishers
     ROS_DEFINITION
     (
         std::shared_ptr<RosIntegration::Publisher<std_msgs::String>> _publisher_1_p;

@@ -124,7 +124,7 @@ inline std::string FORMAT(DisplayAttributes att, std::string text)
 
 
 /*
-    The following functions are example uses of the formatting function
+    The following functions are example uses of the formatting functions
     for common cases. 
 */
 
@@ -162,6 +162,10 @@ inline std::string MARK_UNDERSCORE(std::string text)
 
 
 } // namespace TextFormatting
+
+
+
+
 ////////////////////////////////////////////////
 /////          ASSERT & EXCEPTIONS         /////
 ////////////////////////////////////////////////
