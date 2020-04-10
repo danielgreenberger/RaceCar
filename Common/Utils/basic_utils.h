@@ -243,6 +243,7 @@ inline void __ASSERT (const bool condition, const std::exception& e, const char*
         std::cerr << TextFormatting::MARK_BOLD_BLUE("\t line:      ") << assert_line << std::endl;
         std::cerr << TextFormatting::MARK_BOLD_BLUE("\t function:  ") << assert_func << std::endl;
         std::cerr << TextFormatting::MARK_BOLD_BLUE("\t condition: ") << assert_text << std::endl;
+        std::cerr << std::endl;
         
 
         // Throw the exception

@@ -27,6 +27,7 @@
 #include "JpegCompressor.h"
 
 #include "ros_publisher.h"
+#include "ros_tf_publisher.h"
 #include "ros_defs.h"
 #include "ros_lib.h"
 

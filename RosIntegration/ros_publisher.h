@@ -14,6 +14,11 @@
     main thread. 
     
     The drawback is an increased latency in publishing a single message to ROS, since it has to go through the FIFO. 
+
+    TODOs:
+    1. Extend to "RosInterface" and make Publisher a derived class, allowing to derive listener as well. 
+    2. Add configuration for ROS buffering. 
+    
 */
 
 #ifdef ROS_COMPILATION
@@ -72,7 +77,7 @@ using string = std::string;
 /*      
         This defines an upper limit on the FIFO capacity to store messages, before sending. 
         Since the FIFO memory is dynamically allocated, a limit is needed in order to avoid 
-        the flooding of the FIFO and running out of memory, which can be dangetour for the 
+        the flooding of the FIFO and running out of memory, which can be dangerous for the 
         other RaceCar flows.
 */
 const int ROS_TOPIC_QUEUE_BUFFER_SIZE = 1000;
@@ -124,7 +129,7 @@ typedef enum : uint32_t
         OPTION_FLAG_WARN_ON_MAX_CAPACITY   - if set, a warning message will be printed.
         OPTION_FLAG_OVERRIDE_MAX_CAPACITY  - If set, no messages will be ignored (not recommended for real-time applications).
         
-        ASSERT and OVERRIDE flags are mutually exclusive, and can't be both set. 
+        ASSERT and OVERRIDE flags are mutually exclusive, and therefore can't be both set. 
     */   
     OPTION_FLAG_ASSERT_ON_MAX_CAPACITY       = __BIT(2),  
     OPTION_FLAG_WARN_ON_MAX_CAPACITY         = __BIT(3),  
@@ -177,7 +182,7 @@ private:
     
     // Thread
     std::thread m_ros_node_thread; 
-    bool m_publisher_enabled; 
+    bool m_is_active; 
     
     // ROS-related
     string m_node_name;
@@ -234,7 +239,7 @@ public:
         m_publisher_mutex(), 
         m_flags(flags), 
         m_ros_node_thread(), 
-        m_publisher_enabled(false) 
+        m_is_active(false) 
     {
         /* Check option flags */
         assert_flag_mask_validity();
@@ -284,9 +289,9 @@ public:
     =========================================================*/
     void Publish(T& msg) 
     {
-        ASSERT(m_publisher_enabled, std::exception());
+        ASSERT(m_is_active, std::exception());
         ROS_INTEGRATION_DEBUG_PRINT("publish :: pushing message to back of the queue");
-        
+     
         bool queue_not_full;
        /* Push message to FIFO */
         ROS_PUBLISHER_CRITICAL_SECTION
@@ -342,10 +347,10 @@ public:
     =========================================================*/
     void start()
     {
-        ASSERT(false == m_publisher_enabled, std::exception()); // TODO: add exception
+        ASSERT(false == m_is_active, std::exception()); // TODO: add exception
         
         ROS_INTEGRATION_DEBUG_PRINT(" start :: Starting ROS publisher thread ");
-        m_publisher_enabled = true;
+        m_is_active = true;
         m_ros_node_thread = std::thread(&RosIntegration::Publisher<T>::__node_main, this);
     }
     
@@ -364,14 +369,14 @@ public:
     void stop()
     {
         // Check if publisher is already off
-        if (!m_publisher_enabled)
+        if (!m_is_active)
         {
             ROS_INTEGRATION_DEBUG_PRINT("stop :: Publisher is already off!");
             return;
         }
         
         // Mark the thread to stop execution
-        m_publisher_enabled = false;
+        m_is_active = false;
         
         // Wait for the publisher to finish processing current message
         ROS_INTEGRATION_DEBUG_PRINT("stop :: waiting for thread.");
@@ -397,7 +402,7 @@ private:
     *
     * @author          Daniel Greenberger
     =========================================================*/
-    bool is_flag_set(option_flags_e flag)
+    bool is_flag_set(const option_flags_e flag)
     {
         return (m_flags & flag);
     }
@@ -462,6 +467,7 @@ private:
         ASSERT(ros::master::check(), std::exception()); // Make sure ROS main process is running
         ros::NodeHandle node_handler; 
 
+
         /* Enter main publisher loop */
         __publisher_loop(node_handler);
 
@@ -469,7 +475,7 @@ private:
         /* Finish node execution */
         ROS_INFO_STREAM("ROS publisher stop.  Node name: " << m_node_name); 
         ROS_INTEGRATION_DEBUG_PRINT("ROS publisher stop. ");
-        m_publisher_enabled = false;
+        m_is_active = false;
         
     }
     
@@ -485,10 +491,29 @@ protected:
     *
     * @author          Daniel Greenberger
     =========================================================*/
-    bool publisher_active() // TODO: maybe name it can_publish()?
+    bool active() // TODO: maybe name it can_publish()?
     {
-        return _Usually(m_publisher_enabled && ros::ok );
+        return _Usually(m_is_active && ros::ok );
     }
+    
+    
+    
+    /*=======================================================
+    * @brief           TODO
+    *
+    * @description     TODO
+    *
+    * @param           TODO
+    *
+    * @return          TODO
+    *
+    * @author          TODO
+    =========================================================*/
+    const std::string get_topic_name()
+    {
+        return m_topic_name;
+    }
+
     
 
 
@@ -540,7 +565,7 @@ protected:
         
         
     /*=======================================================
-    * @brief           Publisher node main function
+    * @brief           Publisher node main loop
     *
     * @description     This function works in an infinate loop while the publisher is active. 
     *                  We are checking the internal object FIFO for new messages. 
@@ -554,7 +579,7 @@ protected:
     *
     * @author          Daniel Greenberger
     =========================================================*/
-    void __publisher_loop(ros::NodeHandle& node_handler)
+    virtual void __publisher_loop(ros::NodeHandle& node_handler)
     {
         
         /* Register to publish for topic */
@@ -563,33 +588,26 @@ protected:
         
         
         /* Define publish frequency */
-        ros::Rate loop_rate(ROS_PUBLISH_RATE_PER_SECOND);
+        const ros::Rate loop_rate(ROS_PUBLISH_RATE_PER_SECOND);
 
         
         
         /* Publish */
         int count = 0;
-        while ( publisher_active() )
+        while ( active() )
         {
             
-            // Pull a message from FIFO
             T msg;
             bool msg_exists = pull_message_if_exists(msg);
             
-                
-            // Publish
             if (msg_exists)
             {				
                 ROS_INTEGRATION_DEBUG_PRINT("Publishing message: " << ++count);  
-                
                 node_publisher.publish(msg);
                 ros::spinOnce();
             }
 
-
-            // Wait for next publish interval 
             loop_rate.sleep();
-            
         }
         
     }
