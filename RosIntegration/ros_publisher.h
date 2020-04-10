@@ -588,7 +588,7 @@ protected:
         
         
         /* Define publish frequency */
-        const ros::Rate loop_rate(ROS_PUBLISH_RATE_PER_SECOND);
+        ros::Rate loop_rate(ROS_PUBLISH_RATE_PER_SECOND);
 
         
         
