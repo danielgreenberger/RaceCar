@@ -18,6 +18,10 @@
 #include "basic_utils.h"
 #include "ros_publisher.h"
 #include <tf/transform_broadcaster.h>
+#include <tf/transform_listener.h>
+#include <geometry_msgs/PointStamped.h>
+#include "racecar_coordinates.h"
+#include <nav_msgs/Odometry.h>
 
 namespace RosIntegration
 {
