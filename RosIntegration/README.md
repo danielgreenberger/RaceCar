@@ -153,9 +153,14 @@ catkin_create_pkg is a convenience script for creating a new package.
 
 The first argument (racecar) is the name of the package, and the rest of the arguments are dependency packages - these are 
 packages racecar depends on for compilation/execution. 
+
 roscpp    -  This is the ROS c++ API library.
+
 std_msgs  -  A package containing all standard ROS messages to be published to different topics
+
 tf        -  A package responsible for keeping track of different coordinate systems.
+
+
 
 ##### Step 3: makefile configuration
 
@@ -227,6 +232,21 @@ target_link_libraries(${PROJECT_NAME}
 ```
 
 These are the Cmake configurations for RaceCar. 
+
+
+##### Step 4: Copy all source files
+
+Copy all of racecar source files to catkin_ws/src/racecar/src
+
+##### Step 5: Compile
+
+The last step would be to compile the workspace
+
+Go to catkin_ws main folder and run
+```
+catkin_make
+```
+
 
 
 next, go to 
