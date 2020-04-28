@@ -59,7 +59,7 @@ RaceCar::RaceCar()
 	ROS_CODE_SECTION
 	(
        std::cout << "Init publishers" <<std::endl;
-		_publisher_1_p = std::make_shared<RosIntegration::Publisher<std_msgs::String>> ("daniel_g");
+		_p_odom_publisher = std::make_shared<RosIntegration::OdometerPublisher> ("odom");
 	)
 
 }
@@ -512,7 +512,7 @@ RaceCar &RaceCar::getBitCrazeOutput()
     while (_is_running) 
     {
         /* Get BitCraze data */
-        Flow flow_data = _bitcraze.getFlowOutput();
+        const Flow flow_data = _bitcraze.getFlowOutput();
 
         /* Update global odometer */
         std::lock_guard<std::mutex> lock(_flow_mtx);
@@ -523,7 +523,10 @@ RaceCar &RaceCar::getBitCrazeOutput()
 //        _flow_data = flow_data;
 
         /* ROS ONLY  -- Publish topic */
-        // dgreenbe todo -- publish()
+        ROS_CODE_SECTION
+        (
+            _p_odom_publisher->publish(flow_data);
+        )
 
 
 

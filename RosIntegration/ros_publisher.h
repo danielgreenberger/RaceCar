@@ -134,6 +134,9 @@ typedef enum : uint32_t
     OPTION_FLAG_ASSERT_ON_MAX_CAPACITY       = __BIT(2),  
     OPTION_FLAG_WARN_ON_MAX_CAPACITY         = __BIT(3),  
     OPTION_FLAG_OVERRIDE_MAX_CAPACITY        = __BIT(4),  
+
+    // FLAG_PUBLISH_BUFFER_MSGS_ON_EXIT
+    // RESERVE_MAX_BUFFER_SIZE
         
     OPTION_FLAG_MAX                          = __BIT(31), 
    // TODO: implement OPTION_FLAG_DUMP_TO_FILE? Can also use rosbag for output.
@@ -287,7 +290,7 @@ public:
     *
     * @author          Daniel Greenberger.
     =========================================================*/
-    void Publish(T& msg) 
+    void publish(T& msg) 
     {
         ASSERT(m_is_active, std::exception());
         ROS_INTEGRATION_DEBUG_PRINT("publish :: pushing message to back of the queue");

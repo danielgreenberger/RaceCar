@@ -4,7 +4,10 @@
 /*
 	@DESCRIPTION
 	
-	TODO
+	This file defines a special type of ROS publisher intended for publishing odometer data. 
+    In addition to being a child class of ros_publisher, this class also utilizes the TF 
+    library to define and maintain different coordinate systems for the odometer, robot baselink
+    and a static world frame-of-reference (i.e Lab starting point). 
 */
 
 #ifdef ROS_COMPILATION
@@ -51,13 +54,39 @@ using string = std::string;
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-template <typename T>
-class TimeframePublisher : public Publisher<T>
+
+class OdometerPublisher : public Publisher<nav_msgs::Odometry>
 {
+    
+//--------------------------------------------------------------------------
+//                             Members
+//--------------------------------------------------------------------------
 private:
-    std::shared_ptr<tf::TransformBroadcaster> m_p_broadcaster;  // TODO: consider moving both back to inside function
+    
+    /* 
+            Static transforms publisher 
+            
+            Used for publishing transforms that are not expected to change at run-time, 
+            such as  Odometer => Camera frames transform 
+    */
+    std::shared_ptr<tf::TransformBroadcaster> m_p_static_broadcaster;  
     std::shared_ptr<tf::TransformListener> m_p_listener;
     
+    
+    /*
+            Odometer data accumulator
+            
+            
+    */
+    
+    using dist_t = int;
+    using tsf_t = int;
+    // TODO: we must protect against overflow or wraparound
+    dist_t m_total_dist_x = 0;
+    dist_t m_total_dist_y = 0;
+    dist_t m_curr_height_z = 0;
+    tsf_t m_last_odom_timestamp = 0;   
+    #warning "TODO: make sure all members are needed"
     
 
 
@@ -76,9 +105,9 @@ public:
     *
     * @author          Daniel Greenberger
     =========================================================*/
-    TimeframePublisher (string topic_name, uint32_t flags = DEFAULT_FLAGS, uint32_t max_queue_size = ROS_TOPIC_QUEUE_BUFFER_SIZE)
+    OdometerPublisher (string topic_name, uint32_t flags = DEFAULT_FLAGS, uint32_t max_queue_size = ROS_TOPIC_QUEUE_BUFFER_SIZE)
         :
-        Publisher<T> (topic_name, INVALID_NODE_NAME, flags, max_queue_size)
+        Publisher<nav_msgs::Odometry> (topic_name, INVALID_NODE_NAME, flags, max_queue_size)
     {
         
     }
@@ -86,9 +115,32 @@ public:
     
     
     
+    
+    
 
 //--------------------------------------------------------------------------
 //                           Publisher interface functions
+//--------------------------------------------------------------------------
+
+/*=======================================================
+* @brief           TODO
+*
+* @description     TODO
+*
+* @param           TODO
+*
+* @return          TODO
+*
+* @author          TODO
+=========================================================*/
+void publish(const Flow& odom_data)
+{
+    nav_msgs::Odometry ros_odom = convert_to_ros_odom(odom_data);
+    Publisher::publish(ros_odom);
+}
+
+//--------------------------------------------------------------------------
+//                           Publisher internal functions
 //--------------------------------------------------------------------------
 private:
     /*=======================================================
@@ -110,27 +162,26 @@ private:
     {
         
         /* Register to publish for topic */
-        ros::Publisher node_publisher = node_handler.advertise<T>(this->get_topic_name(), 100);
+        ros::Publisher node_publisher = node_handler.advertise<nav_msgs::Odometry>(this->get_topic_name(), 100);
 
         /* Init TF publisher and listener */
         m_p_listener = std::make_shared<tf::TransformListener> (ros::Duration(10));
-      //  m_p_broadcaster = std::make_shared<tf::TransformBroadcaster> ();  // TODO: publisher/listener should belong to node
+      //  m_p_static_broadcaster = std::make_shared<tf::TransformBroadcaster> ();  // TODO: publisher/listener should belong to node
 
         
         /* Define publish frequency */
         ros::Rate publisher_rate_per_second(10);
         const int tf_rate_loop = 10;
         
+        
         /* Publish in loop */
         int count = 0;
         while ( this->active() )
-            
         {
-            
-            publish_frame_transform();
+            publish_static_transforms();
             
             // Pull a message from FIFO
-            T msg;
+            nav_msgs::Odometry msg;
             bool msg_exists = this->pull_message_if_exists(msg);
             
                 
@@ -147,8 +198,6 @@ private:
             // Wait for next publish interval 
             publisher_rate_per_second.sleep();
             
-       //     transformPoint();
-            
         }
         
         
@@ -161,23 +210,21 @@ private:
     
     
     
+    
     /*=======================================================
-    * @brief           TODO
+    * @description     Publish coordinate frames data between the robots internal components (Camera, odomeder etc.)
+    *                  which remain constant during runtime
     *
-    * @description     TODO
+    * @return          None.
     *
-    * @param           TODO
-    *
-    * @return          TODO
-    *
-    * @author          TODO
+    * @author          Daniel Greenberger
     =========================================================*/
-    void publish_frame_transform()
+    void publish_static_transforms()
     {
         
-        m_p_broadcaster = std::make_shared<tf::TransformBroadcaster> ();  // TODO: publisher/listener should belong to node
+        m_p_static_broadcaster = std::make_shared<tf::TransformBroadcaster> ();  // TODO: publisher/listener should belong to node
        
-        std::cout << "Publishing TF transform" <<std::endl;
+        std::cout << "Publishing TF transforms:" <<std::endl;
         
         /* Transform:  Base -> Camera */
         auto transform = tf::Transform(RSENSE_TO_BASE_ROTATION, RSENSE_TO_BASE_TRANSLATION);
@@ -187,7 +234,7 @@ private:
                                                 BASE_FRAME_ID,
                                                 CAMERA_FRAME_ID
                                                 );
-        m_p_broadcaster->sendTransform(tf_transform);
+        m_p_static_broadcaster->sendTransform(tf_transform);
                                       
 
         /* Transform:  Camera -> Bitcraze */
@@ -198,8 +245,48 @@ private:
                                               CAMERA_FRAME_ID,
                                               ODOMETER_FRAME_ID 
                                               );
-        m_p_broadcaster->sendTransform(tf_transform);
+        m_p_static_broadcaster->sendTransform(tf_transform);
 
+    }
+    
+    
+    /*=======================================================
+    * @brief           Converts Bitcraze data msg to standard ROS odometry msg
+    *
+    * @param           odom_data  -  Odometry in Bitcraze format
+    *
+    * @return          ROS odometry msg, which can be published to a topic
+    *
+    * @author          Daniel Greenberger
+    =========================================================*/
+    nav_msgs::Odometry convert_to_ros_odom(const Flow& odom_data)
+    {
+        /* Update total distance counter */
+        m_total_dist_x += odom_data.deltaX;
+        m_total_dist_y += odom_data.deltaY;
+        
+        
+        /* Calculate speed according to last result */
+        const dist_t speed_x = (odom_data.deltaX) / (odom_data.dt);
+        const dist_t speed_y = (odom_data.deltaY) / (odom_data.dt);
+        
+        
+        /* Build ROS odometry msg */
+        nav_msgs::Odometry odom;
+        odom.header.stamp = ros::Time::now();
+        odom.header.frame_id = ODOMETER_FRAME_ID;
+        
+        odom.pose.pose.position.x = m_total_dist_x;
+        odom.pose.pose.position.y = m_total_dist_y;
+        odom.pose.pose.position.z = odom_data.range;
+        
+        odom.child_frame_id = "lab";
+        #warning "Create frame for lab"
+        odom.twist.twist.linear.x = speed_x;
+        odom.twist.twist.linear.y = speed_y;
+        
+        return odom;
+        
     }
 
 
@@ -233,6 +320,9 @@ private:
 //              ASSERT(false, tf::TransformException("Received an exception trying to transform a point"));
 //         }
 //      }
+
+
+
 
 #undef ROS_PUBLISHER_CRITICAL_SECTION
 

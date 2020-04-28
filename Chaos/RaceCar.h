@@ -27,7 +27,7 @@
 #include "JpegCompressor.h"
 
 #include "ros_publisher.h"
-#include "ros_tf_publisher.h"
+#include "ros_odometer_publisher.h"
 #include "ros_defs.h"
 #include "ros_lib.h"
 
@@ -238,9 +238,6 @@ public:
 
 
 
-
-
-
 //--------------------------------------------------------------------------
 //                               members
 //--------------------------------------------------------------------------
@@ -250,7 +247,11 @@ public:
      * stops the Chaos on user demand
      */
     bool _is_running;
-    
+        // ROS Publishers
+    ROS_DEFINITION
+    (
+        std::shared_ptr<RosIntegration::OdometerPublisher> _p_odom_publisher;
+    )
     
     
 private: //members
@@ -262,11 +263,7 @@ private: //members
         RealSense _camera;
     )
         
-    // ROS Publishers
-    ROS_DEFINITION
-    (
-        std::shared_ptr<RosIntegration::Publisher<std_msgs::String>> _publisher_1_p;
-    )
+
 
     //communication
     std::shared_ptr<ITcpClient> _tcp_client;
