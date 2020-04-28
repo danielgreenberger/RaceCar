@@ -17,6 +17,7 @@ Although ROS is not a real OS , it provides services which are typically provide
 
 
 > ROS is an open-source, meta-operating system for your robot. It provides the services you would expect from an operating system, including hardware abstraction, low-level device control, implementation of commonly-used functionality, message-passing between processes, and package management. It also provides tools and libraries for obtaining, building, writing, and running code across multiple computers. ROS is similar in some respects to 'robot frameworks,' such as Player, YARP, Orocos, CARMEN, Orca, MOOS, and Microsoft Robotics Studio.
+
 from: http://wiki.ros.org/ROS/Introduction
 
 ### ROS integration with RaceCar
@@ -126,6 +127,105 @@ For more information: http://wiki.ros.org/rqt_console
 
 
 ## ROS integration with RaceCar
+### Getting started
+First, make sure that you have ROS installed on your system.
+ROS installation guide can be found at:
+http://wiki.ros.org/ROS/Installation
+
+The next step would be to create a workspace and package using catkin
+
+### Creating catkin workspace and package
+
+##### Step 1: Creating the workspace
+First go to the path where you wish to place your workspace (can be any path you have read/write/execute persmissions).
+Then create the workspace folder:
+> mkdir -p catkin_ws/src
+
+If you want to use this workspace (i.e) running nodes, you will need to source it:
+> source catkin_ws/devel/setup.bash
+
+##### Step 2: Creating the racecar package
+The next step would be to create a package for racecar inside the workspace we just created.
+
+> catkin_create_pkg racecar roscpp std_msgs tf
+
+catkin_create_pkg is a convenience script for creating a new package.
+The first argument (racecar) is the name of the package, and the rest of the arguments are dependency packages - these are 
+packages racecar depends on for compilation/execution. 
+roscpp    -  This is the ROS c++ API library.
+std_msgs  -  A package containing all standard ROS messages to be published to different topics
+tf        -  A package responsible for keeping track of different coordinate systems.
+
+##### Step 3: makefile configuration
+
+Under catkin_ws/src/racecar you will find a CMakeLists.txt. 
+
+Add the following lines under "build" section:
+>  include_directories(
+>  # include
+>    ${catkin_INCLUDE_DIRS}
+>  )
+>  
+>  
+>  add_definitions(-DROS_COMPILATION)
+>  add_definitions(-DNO_CAMERA)
+>  
+>  
+>  ## Add linker flags
+>  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+>  
+>  set(SOURCE_FILES
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/main.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/RaceCar.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/RaceCar.h
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/Chaos_types.h
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpClient/TcpClient.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpClient/ITcpClient.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/motorAPI/Arduino.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/motorAPI/MotorController.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/cameraAPI/RealSenseAPI.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpServer/ITcpServer.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpServer/TcpServer.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/jpeg/JpegCompressor.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/Serial/Serial.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/Serial/ISerial.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/bitcraze/bitcraze.cpp
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/RosIntegration/ros_lib.cpp
+>  
+>      )
+>  
+>  
+>  set(INCLUDES
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpClient
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpServer
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/motorAPI
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/arduino/bitcraze
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/cameraAPI
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/Serial
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/jpeg
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/bitcraze
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/Common/Coordinates
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/Common/Utils
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos
+>      ${CMAKE_CURRENT_SOURCE_DIR}/src/RosIntegration
+>      )
+>  
+>  
+>  INCLUDE_DIRECTORIES(${INCLUDES})
+>  
+>  add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+>  
+>  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+>  
+>  target_link_libraries(${PROJECT_NAME}
+>      -lrealsense2
+>      -lturbojpeg
+>      -lz)
+>  
+
+
+next, go to 
+
 ### ROS installation on Jeston
 ### ROS compilation enviroment
 In order to avoid code duplication, the ROS integration will be embedded in the RaceCar project under special 
