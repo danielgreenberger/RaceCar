@@ -68,12 +68,12 @@ ROS provides easy ways to communicate between different components of the system
 ROS comes with many built-in and other useful tools which can be used on the platform, 
 including:
 
-- Rviz 				     - A 3D visualization tool for ROS.
-- Rosbag			     - A tools allowing to collect information published to ROS nodes and play them back later.
-- TF                     - lets the user keep track of multiple coordinate frames over time, by maintaining the relationship between different coordinate 
+- **Rviz** 				     - A 3D visualization tool for ROS.
+- **Rosbag**			     - A tools allowing to collect information published to ROS nodes and play them back later.
+- **TF**                     - lets the user keep track of multiple coordinate frames over time, by maintaining the relationship between different coordinate 
 						   frames and allows an easy transformation of points, vectors, etc. between coordinate frames at any desired point in time.
-- Google Cartographer    - A tool providing SLAM
-- Intel RealSense driver - Provides a wrapper for all RealSense funtionality and allows an easy use of the realsense device.
+- **Google Cartographer**    - A tool providing SLAM
+- **Intel RealSense driver** - Provides a wrapper for all RealSense funtionality and allows an easy use of the realsense device.
 
 
 ## ROS basic concepts
@@ -82,7 +82,8 @@ including:
 
 Nodes are the basic execution entities in ROS, representing the equivalent of a "thread" or "process" in traditional OS. 
 
-For example a node can represent: a camera, motor, etc.. (this idea supports an OOP view of the system which is often useful)
+As an example, a node can represent a camera or motor controller module. 
+(this idea supports an OOP view of the system which is often useful)
 
 Nodes communicate with each other using ROS facilities. 
 
