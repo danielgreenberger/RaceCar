@@ -166,8 +166,7 @@ private:
 
         /* Init TF publisher and listener */
         m_p_listener = std::make_shared<tf::TransformListener> (ros::Duration(10));
-      //  m_p_static_broadcaster = std::make_shared<tf::TransformBroadcaster> ();  // TODO: publisher/listener should belong to node
-
+        m_p_static_broadcaster = std::make_shared<tf::TransformBroadcaster> ();  // TODO: publisher/listener should belong to node
         
         /* Define publish frequency */
         ros::Rate publisher_rate_per_second(10);
@@ -178,6 +177,8 @@ private:
         int count = 0;
         while ( this->active() )
         {
+            
+           
             publish_static_transforms();
             
             // Pull a message from FIFO
@@ -189,7 +190,7 @@ private:
             if (msg_exists)
             {				
                 ROS_INTEGRATION_DEBUG_PRINT("Publishing message: " << ++count);  
-                
+                 publish_odom_to_lab_transformation(msg);
                 node_publisher.publish(msg);
                 ros::spinOnce();
             }
@@ -222,9 +223,7 @@ private:
     void publish_static_transforms()
     {
         
-        m_p_static_broadcaster = std::make_shared<tf::TransformBroadcaster> ();  // TODO: publisher/listener should belong to node
-       
-        std::cout << "Publishing TF transforms:" <<std::endl;
+        ASSERT(m_p_static_broadcaster != nullptr, std::exception());
         
         /* Transform:  Base -> Camera */
         auto transform = tf::Transform(RSENSE_TO_BASE_ROTATION, RSENSE_TO_BASE_TRANSLATION);
@@ -247,6 +246,43 @@ private:
                                               );
         m_p_static_broadcaster->sendTransform(tf_transform);
 
+    }
+    
+    
+    
+    /*=======================================================
+    * @description     Publish the current transformation between the RaceCar odometry frame and the lab,
+    *                  according to the accumulated data from the odometer.
+    * 
+    * @param           odom_msg  -  This is an odometry message which will be used to define the transformation 
+    *                               We will use the xyz position of the message to construct our translation, 
+    *                               and the twist will be always 0
+    * 
+    *                  TODO: maybe add twist as well?
+    * 
+    * @author          Daniel Greenberger
+    =========================================================*/
+    void publish_odom_to_lab_transformation(nav_msgs::Odometry odom_msg)
+    {
+        ASSERT(m_p_static_broadcaster != nullptr, std::exception());
+
+        
+        const auto curr_translation_vec = tf::Vector3(
+                                                      odom_msg.pose.pose.position.x,
+                                                      odom_msg.pose.pose.position.y,
+                                                      odom_msg.pose.pose.position.z
+                                                   );
+        auto transform = tf::Transform(tf::Matrix3x3::getIdentity(), curr_translation_vec);
+
+        auto tf_transform = tf::StampedTransform(
+                                              transform,
+                                              odom_msg.header.stamp,
+                                              ODOMETER_FRAME_ID,
+                                              LAB_FRAME_ID 
+                                              );
+        m_p_static_broadcaster->sendTransform(tf_transform);
+    
+        
     }
     
     
@@ -280,8 +316,7 @@ private:
         odom.pose.pose.position.y = m_total_dist_y;
         odom.pose.pose.position.z = odom_data.range;
         
-        odom.child_frame_id = "lab";
-        #warning "Create frame for lab"
+        odom.child_frame_id = LAB_FRAME_ID;
         odom.twist.twist.linear.x = speed_x;
         odom.twist.twist.linear.y = speed_y;
         

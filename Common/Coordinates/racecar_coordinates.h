@@ -151,6 +151,17 @@ const std::string ODOMETER_FRAME_ID = "racecar_odometer_frame";
 
 
 
+//--------------------------------------------------------------------------
+//                              Lab frame
+//--------------------------------------------------------------------------
+
+const std::string LAB_FRAME_ID = "racecar_lab_frame";
+
+
+
+
+
+
 
 
 
