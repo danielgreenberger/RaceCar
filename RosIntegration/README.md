@@ -163,67 +163,67 @@ Under catkin_ws/src/racecar you will find a CMakeLists.txt.
 
 Add the following lines under "build" section:
 '''
-  include_directories(
-  # include
-    ${catkin_INCLUDE_DIRS}
-  )
-  
-  
-  add_definitions(-DROS_COMPILATION)
-  add_definitions(-DNO_CAMERA)
-  
-  
-  ## Add linker flags
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
-  
-  set(SOURCE_FILES
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/main.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/RaceCar.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/RaceCar.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/Chaos_types.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpClient/TcpClient.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpClient/ITcpClient.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/motorAPI/Arduino.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/motorAPI/MotorController.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/cameraAPI/RealSenseAPI.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpServer/ITcpServer.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpServer/TcpServer.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/jpeg/JpegCompressor.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/Serial/Serial.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/Serial/ISerial.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/bitcraze/bitcraze.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/RosIntegration/ros_lib.cpp
-  
-      )
-  
-  
-  set(INCLUDES
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpClient
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpServer
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/motorAPI
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/arduino/bitcraze
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/cameraAPI
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/Serial
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/jpeg
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/bitcraze
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/Common/Coordinates
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/Common/Utils
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/RosIntegration
-      )
-  
-  
-  INCLUDE_DIRECTORIES(${INCLUDES})
-  
-  add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-  
-  target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
-  
-  target_link_libraries(${PROJECT_NAME}
-      -lrealsense2
-      -lturbojpeg
-      -lz)
-  
+include_directories(
+# include
+  ${catkin_INCLUDE_DIRS}
+)
+
+
+add_definitions(-DROS_COMPILATION)
+add_definitions(-DNO_CAMERA)
+
+
+## Add linker flags
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+
+set(SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/RaceCar.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/RaceCar.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos/Chaos_types.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpClient/TcpClient.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpClient/ITcpClient.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/motorAPI/Arduino.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/motorAPI/MotorController.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/cameraAPI/RealSenseAPI.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpServer/ITcpServer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpServer/TcpServer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/jpeg/JpegCompressor.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Serial/Serial.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Serial/ISerial.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/bitcraze/bitcraze.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/RosIntegration/ros_lib.cpp
+
+    )
+
+
+set(INCLUDES
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpClient
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/TcpServer
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/motorAPI
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/arduino/bitcraze
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/cameraAPI
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Serial
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/jpeg
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/bitcraze
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Common/Coordinates
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Common/Utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Chaos
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/RosIntegration
+    )
+
+
+INCLUDE_DIRECTORIES(${INCLUDES})
+
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+
+target_link_libraries(${PROJECT_NAME}
+    -lrealsense2
+    -lturbojpeg
+    -lz)
+
 '''
 
 next, go to 
