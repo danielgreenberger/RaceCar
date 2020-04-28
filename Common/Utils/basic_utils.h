@@ -9,7 +9,7 @@
 /*
 	@DESCRIPTION
 	
-	This file includes some basic utilities which can be usefull across the entire project. 
+	This file includes some basic utilities which can be useful across the entire project. 
 */
 
 
