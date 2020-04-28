@@ -162,7 +162,7 @@ tf        -  A package responsible for keeping track of different coordinate sys
 Under catkin_ws/src/racecar you will find a CMakeLists.txt. 
 
 Add the following lines under "build" section:
-'''
+```
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
@@ -224,7 +224,10 @@ target_link_libraries(${PROJECT_NAME}
     -lturbojpeg
     -lz)
 
-'''
+```
+
+These are the Cmake configurations for RaceCar. 
+
 
 next, go to 
 
