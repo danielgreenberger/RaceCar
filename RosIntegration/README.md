@@ -65,7 +65,7 @@ as well as the option to use third-party drivers for some components (i.e RealSe
 ROS provides easy ways to communicate between different components of the system, including a built-in Publisher-Subscriber model.  
 
 ###### Complementary tools  
-ROS comes with many built-in and other usefull tools which can be used on the platform, 
+ROS comes with many built-in and other useful tools which can be used on the platform, 
 including:
 
 - Rviz 				     - A 3D visualization tool for ROS.
@@ -136,6 +136,9 @@ The next step would be to create a workspace and package using catkin
 
 ### Creating catkin workspace and package
 
+The build process under ROS is done using the **catkin** tool, which is based on a modified version of cmake.
+The rest of this sections will explain how to work with catkin.
+
 ##### Step 1: Creating the workspace
 First go to the path where you wish to place your workspace (can be any path you have read/write/execute persmissions).
 Then create the workspace folder:
@@ -154,11 +157,11 @@ catkin_create_pkg is a convenience script for creating a new package.
 The first argument (racecar) is the name of the package, and the rest of the arguments are dependency packages - these are 
 packages racecar depends on for compilation/execution. 
 
-roscpp    -  This is the ROS c++ API library.
+**roscpp**    -  This is the ROS c++ API library.
 
-std_msgs  -  A package containing all standard ROS messages to be published to different topics
+**std_msgs**  -  A package containing all standard ROS messages to be published to different topics
 
-tf        -  A package responsible for keeping track of different coordinate systems.
+**tf**        -  A package responsible for keeping track of different coordinate systems.
 
 
 
@@ -167,15 +170,20 @@ tf        -  A package responsible for keeping track of different coordinate sys
 Under catkin_ws/src/racecar you will find a CMakeLists.txt. 
 
 Add the following lines under "build" section:
+
+
 ```
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
 )
 
+## This is the preprocessor flag which define the ROS compilation flavor (if not defined, all ROS code is redacted by the preprocessor)
+add_definitions(-DROS_COMPILATION)  
 
-add_definitions(-DROS_COMPILATION)
-add_definitions(-DNO_CAMERA)
+
+## This is because we use the intel RealSense wrapper for ROS
+add_definitions(-DNO_CAMERA)  
 
 
 ## Add linker flags
@@ -231,8 +239,10 @@ target_link_libraries(${PROJECT_NAME}
 
 ```
 
-These are the Cmake configurations for RaceCar. 
+These are the . 
 
+**Note:** The lines above correspond to the Cmake configurations for RaceCar, and need to be updated whenever the racecar 
+cmake is changed (i.e new file added/deleted).
 
 ##### Step 4: Copy all source files
 
@@ -249,24 +259,12 @@ catkin_make
 
 
 
-next, go to 
-
-### ROS installation on Jeston
-### ROS compilation enviroment
+### ROS compilation flag
 In order to avoid code duplication, the ROS integration will be embedded in the RaceCar project under special 
-compilation flag. 
+compilation flag: **ROS_COMPILATION**. 
 
-- A preprocessor macro for all ROS-related code and definitions
+If you used the above instruction for creating the racecar package, you will notice we added ROS_COMPILATION as a definition in the makefile.
 
-The compilation for ROS is done using catkin which is a modified version of cmake.
-
-TODO insert a guide on how to create catkin workspace with cmake, step-by-step:
-(maybe we can use catkin_create_pkg for some of the steps)
-1. Create catkin workspace
-2. Copy files
-3. Edit cmake
-4. Add other nodes (such as RealSense wrapper)
-5. run catkin_make
 
 
 
