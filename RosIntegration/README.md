@@ -2,72 +2,62 @@
 
 
 
+This document provides a description of the integration between ROS and the RaceCar project, and will consist of 2 parts. 
+
+The first part would consist of a brief overview of the ROS system, its basic functionality and it's tools.
+
+The second part of this document will be more practical, and will include a guide to building with ROS (TODO: insert link) as well as a description of how ROS was integrated with RaceCar, along with the description of the wrapper API (TODO: insert link). 
+
+Please note that the use of ROS in optional, and may not be suitable for all use-cases. 
 
 
-## Introduction
+## Introduction 
 
-This document will provide a short overview of ROS and its basic functionality and tools.
-We will also describe how the ROS enviroment was integrated into the RaceCar project. 
 
-Please note thar the use of ROS in optional, and may not be suitable for all use-cases. 
 
 ### What is ROS
+
 ROS (Robot Operating System) is a set of tools and libraries which help software developers create robot applications.
 Although ROS is not a real OS , it provides services which are typically provided by operating systems. 
 
+from ROS official website:
 
 > ROS is an open-source, meta-operating system for your robot. It provides the services you would expect from an operating system, including hardware abstraction, low-level device control, implementation of commonly-used functionality, message-passing between processes, and package management. It also provides tools and libraries for obtaining, building, writing, and running code across multiple computers. ROS is similar in some respects to 'robot frameworks,' such as Player, YARP, Orocos, CARMEN, Orca, MOOS, and Microsoft Robotics Studio.
 
 from: http://wiki.ros.org/ROS/Introduction
 
 
-### ROS integration with RaceCar
-
-Using RaceCar with the ROS framework has many advantages, as described above. 
-
-The goal is to provide an easy option to integrate ROS with the current RaceCar flows, 
-such that:
-1. The use will be as simplified as possible.
-2. Using ROS will be optional and not obligatory - we could always choose between ROS and regular mode
-3. Minimal change to the system in order to adapt it to ROS
-
--- The use will be as simplified as possible.--
-For this, wrapper classes and interfaces were created for ROS basic functionality. 
-
--- Using ROS will be optional and not obligatory --
-The ROS integration code and definition is controlled by a preprocessor compilation flag, 
-which is only activated when compiling for ROS. 
-In ROS mode, the RealSense camera has a formal supported driver, making RaceCars wrapper classes redundant. 
-Therefore, all camera code and definition was placed under a compilation flag, which allows to disable it
-when we are using RaceCar with ROS, or for any other purpose. 
-
--- Minimal change to the system in order to adapt it to ROS --
-
-The best way to adapt RaceCar to ROS would be to make it moduler, by separating all RaceCar components (RealSense, Bitcraze, Chaos, etc.)
-into different execution nodes. 
-Alas, doing it this way will make it harder to maintain the project code for both ROS and non-ROS enviroments, and
-will complicate deploying the RaceCar in ROS. 
-
-Therefore, RaceCar will remain as one process, and will not be a ROS node by itself. 
-However, RaceCar will have objects which will register as ROS nodes (i.e publisher, see below). 
-
-
 
 ### Motivation
 
 The integration with ROS has a few great advantages:
-###### modularity 
-ROS views the system in an Object oriented programming way. 
+
+###### Modularity 
+
+ROS has a very Object Oriented narrative. 
+Many differents Robot components such as Motor controller or Camera can be represented independantly in the system, 
+apart from other components. 
+
 This is very helpful since many times the different components of the robot (which can be many) 
-are loosely related to each other. This separation can be easier as a design and for debugging, 
-as well as the option to use third-party drivers for some components (i.e RealSense)
+are loosely related to each other. 
+
+Such modular approach can also be easier to design and for debugging.  
+It also gives us the option to integrate third-party libraries for our components, such as the RealSense ROS driver (TODO insert a link).
+
 
 ###### infrastructure 
-ROS provides easy ways to communicate between different components of the system, including a built-in Publisher-Subscriber model.  
+
+ROS provides a built-in infrastructure which answers the needs of many robot system, such as it's Publish-Subscriber model of messages and topic (TODO insert link).  
+
 
 ###### Complementary tools  
+ROS has a growing and thriving community which develops many useful tools. 
+Some tools come shipped with ROS, but many other open-source libraries can be downloaded and used. 
 
-
+This document briefly discusses some of the important libraries, but many others can be found at the 
+ROS official website:
+http://wiki.ros.org/
+https://index.ros.org/packages/
 
 
 
@@ -82,17 +72,41 @@ ROS provides easy ways to communicate between different components of the system
 Nodes are the basic execution entities in ROS, representing the equivalent of a "thread" or "process" in traditional OS. 
 
 As an example, a node can represent a camera or motor controller module. 
-(this idea supports an OOP view of the system which is often useful)
 
 Nodes communicate with each other using ROS facilities. 
 
-TODO - explain clearly the connection between nodes, topics, and related infrastructure (service, publisher, listener, etc.)
-TODO - (maybe add a table with comparision of ROS concepot to Linux, like process=Node etc)
+> A node is a process that performs computation. Nodes are combined together into a graph and communicate with one another using streaming topics, RPC services, and the Parameter Server. These nodes are meant to operate at a fine-grained scale; a robot control system will usually comprise many nodes. For example, one node controls a laser range-finder, one Node controls the robot's wheel motors, one node performs localization, one node performs path planning, one node provides a graphical view of the system, and so on.
+
+from: http://wiki.ros.org/Nodes
+
+
 
 ### Messages and Topics
 
-ROS nodes can communicate with each other by sending and receiving messages. 
-TODO - continue
+ROS nodes can communicate with each other by sending and receiving messages of a specific *topic*
+
+> Topics are named buses over which nodes exchange messages. Topics have anonymous publish/subscribe semantics, which decouples the production of information from its consumption. In general, nodes are not aware of who they are communicating with. Instead, nodes that are interested in data subscribe to the relevant topic; nodes that generate data publish to the relevant topic. There can be multiple publishers and subscribers to a topic.
+
+from: http://wiki.ros.org/Topics
+
+
+Many messages of different types can be sent and received using ROS topics. 
+
+Many messages types are available by the **common_msgs** package, which comes shipped with ROS. 
+Other types can be found in third-party libraries or defined by the user. 
+
+The messages in **common_msgs** are often used as the standard messages by many applications (i.e Google Cartographer), so it's better
+to try using them before re-inventing the wheel. 
+
+such as Pointcloud or Odometer data. 
+
+common_msgs
+
+Many message type definitions are available from ROS built-in libraries: std_msgs 
+
+ , and the user may define 
+
+
 
 ### Packages and Workspaces
 
@@ -180,6 +194,59 @@ For more information: http://wiki.ros.org/rviz
 						       frames and allows an easy transformation of points, vectors, etc. between coordinate frames at any desired point in time.
 - **Google Cartographer**    - A tool providing Simultaneous localization and mapping (SLAM)
 - **Intel RealSense driver** - Provides a wrapper for all RealSense funtionality and allows an easy use of the realsense device.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### ROS integration with RaceCar
+
+Using RaceCar with the ROS framework has many advantages, as described above. 
+
+The goal is to provide an easy option to integrate ROS with the current RaceCar flows, 
+such that:
+1. The use will be as simplified as possible.
+2. Using ROS will be optional and not obligatory - we could always choose between ROS and regular mode
+3. Minimal change to the system in order to adapt it to ROS
+
+-- The use will be as simplified as possible.--
+For this, wrapper classes and interfaces were created for ROS basic functionality. 
+
+-- Using ROS will be optional and not obligatory --
+The ROS integration code and definition is controlled by a preprocessor compilation flag, 
+which is only activated when compiling for ROS. 
+In ROS mode, the RealSense camera has a formal supported driver, making RaceCars wrapper classes redundant. 
+Therefore, all camera code and definition was placed under a compilation flag, which allows to disable it
+when we are using RaceCar with ROS, or for any other purpose. 
+
+-- Minimal change to the system in order to adapt it to ROS --
+
+The best way to adapt RaceCar to ROS would be to make it moduler, by separating all RaceCar components (RealSense, Bitcraze, Chaos, etc.)
+into different execution nodes. 
+Alas, doing it this way will make it harder to maintain the project code for both ROS and non-ROS enviroments, and
+will complicate deploying the RaceCar in ROS. 
+
+Therefore, RaceCar will remain as one process, and will not be a ROS node by itself. 
+However, RaceCar will have objects which will register as ROS nodes (i.e publisher, see below). 
+
+
+
+
+
+
+
 
 
 
