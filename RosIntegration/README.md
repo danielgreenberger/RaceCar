@@ -97,38 +97,133 @@ TODO - continue
 
 ### Packages and Workspaces
 
-#### overview
+> Software in ROS is organized in packages. A package might contain ROS nodes, a ROS-independent library, a dataset, configuration files, a third-party piece of software, or anything else that logically constitutes a useful module. The goal of these packages it to provide this useful functionality in an easy-to-consume manner so that software can be easily reused.
 
-TODO - what is a package and whats the difference from node?
+from: http://wiki.ros.org/Packages
+
+
+A workspace is a collection of packages, organized using a built-in tool called **catkin**.
+
+To begin creating code for ROS using catkin, it is useful to read the following tutorial:
+
+http://wiki.ros.org/catkin/Tutorials/create_a_workspace
+
+ 
 
 
 
-#### Creating workspaces with catkin
-
-#### Sourcing the workspace
-TODO - explain why we need to source the workspace
 
 ## ROS basic tools
 
-### roscd
+### Command line tools
 
-### rospack 
-### rqt_launch 
+A (very) partial list includes:
+
+roscd  - A tool offering an alternative to the 'cd' command in the terminal, allowing to switch directories by package name instead of absolute/relative path.
+
+rosrun - Similarly to roscd, allows to **run** nodes from packages easily. 
+
+
+rospack  -  A tool for retrieving information about ROS packages available on the filesystem. 
+
+
+rostopic  -  Display information about active ROS topics (i.e publish-frequency, listen to a topic, etc.)
+
+**Note** In order to use some of the tools you must source your catkin workspace. Check ROS documentation for more details. 
+
+### Graphic tools
+
+**rqt** is a convenience tool which group many useful GUI tools for ROS. 
+
+Some of the most useful tools include:
+
+##### rqt_launch 
+
 This tools allows easy running of multiple nodes together. 
 In our project it will be used for running RaceCar, RealSense driver and google cartographer. 
 
 For more information: http://wiki.ros.org/rqt_launch
 
-### rqt_console
+##### rqt_console
 
 ROS has a dedicated topic called "rosout" which is used as "printf" by nodes.  
 This is a graphical tool allowing to view log prints of nodes in the ROS system. 
 
 For more information: http://wiki.ros.org/rqt_console
 
+##### rviz
 
-## ROS integration with RaceCar
-### Getting started
+A graphic interface tool allowing to visualize a lot of useful information available from topic such as a robot path in different coordinate systems, maps, 
+various camera data and more. 
+
+The link below contains detailed information about rviz, including tutorials for beginners.
+
+For more information: http://wiki.ros.org/rviz
+
+
+
+
+
+
+## ROS and the RaceCar project
+
+### High Level Design overview
+
+The main idea was to create an easy-to-use interface of ROS, while still allowing portability of the RaceCar code to other platform (specifically, to just running RaceCar directly from the OS). 
+
+In order to archive this balance, the following design decisions were made:
+
+1. The use of ROS funtionality is done through wrapper classes which were developed for this project (currently only a publisher class is available). 
+   Those classes expose a very simple interface, keeping the ROS-specific details to the internal implementation. 
+   This way it will be easier in the future to port the code to other platforms. 
+2. The RaceCar process itself is not a ROS node. To be more exact, although it's technically run as a node, it doesn't register as a node is the ROS system and
+   therefore doesn't have a name. 
+   The reason is again portability, as we aimed to mask out ROS specific details from the RaceCar interface. 
+   Instead, every instance created from the wrapper classes (i.e RosIntegration::Publisher) registers as a names node, 
+   and all interaction with ROS is done through those wrapper classes. 
+
+
+Each instance of the wrapper classes is performed on a different thread, and the exchange of information (with RaceCar main thread) is done through
+FIFO memory buffers (For more information see documentation in the spefific files). 
+
+This approach was decided for a few reasons:
+
+1. Nvidia Jetson supports multi-threaded excecution, and we wanted to use this functionality for better performance. 
+
+2. Separate threads allow more fine-grained control of critical-timing flows.  
+   This is because the overhead on the main thread only includes the data-copy into the buffer, therefore having a minimal impact on the flow latency. 
+
+
+### RaceCar compilation flavors
+
+In order to avoid code duplication, some of the functionality was put under #ifdef compilation flags.
+
+##### ROS_COMPILATION
+
+All ROS-related code and definition (including the wrapper classes) will be put under this flag.  
+When creating the cmake for the ROS build (TODO insert link) we add the ROS_COMPILATION flag to include the
+RosIntegration libraries. 
+
+For other platform, we don't define this flag and therefore all the ROS-related code is redacted by the compiler. 
+
+##### NO_CAMERA
+
+If set, all the realsense-related code of RaceCar is redacted by the compiler. 
+
+This flag is needed when we want to use the official realsense driver for ROS:
+https://github.com/IntelRealSense/realsense-ros
+
+When the offical driver is used, it is run as a separate node to RaceCar and manages the camera, 
+and therefore we need to disable our RaceCar camera API. 
+ 
+When not using ROS, or using ROS without the official driver, we will not define this flag and therefore will be able to use 
+the RaceCar camera API in the usual way. 
+
+
+
+## Getting started
+
+### ROS installation
 First, make sure that you have ROS installed on your system.
 ROS installation guide can be found at:
 http://wiki.ros.org/ROS/Installation
@@ -141,17 +236,20 @@ The build process under ROS is done using the **catkin** tool, which is based on
 The rest of this sections will explain how to work with catkin.
 
 ##### Step 1: Creating the workspace
-First go to the path where you wish to place your workspace (can be any path you have read/write/execute persmissions).
-Then create the workspace folder:
-> mkdir -p catkin_ws/src
+First go to the path where you wish to place your workspace, which can be any path where you have read/write/execute persmissions.
 
-If you want to use this workspace (i.e running nodes), you will need to source it:
-> source catkin_ws/devel/setup.bash
+Then create the workspace folder:
+```
+mkdir -p catkin_ws/src
+```
+
+If you want to use this workspace with various node tools, you will need to source it:
+``` source catkin_ws/devel/setup.bash ```
 
 ##### Step 2: Creating the racecar package
 The next step would be to create a package for racecar inside the workspace we just created.
 
-> catkin_create_pkg racecar roscpp std_msgs tf
+``` catkin_create_pkg racecar roscpp std_msgs tf ```
 
 catkin_create_pkg is a convenience script for creating a new package.
 
@@ -240,7 +338,6 @@ target_link_libraries(${PROJECT_NAME}
 
 ```
 
-These are the . 
 
 **Note:** The lines above correspond to the Cmake configurations for RaceCar, and need to be updated whenever the racecar 
 cmake is changed (i.e new file added/deleted).
@@ -251,25 +348,24 @@ Copy all of racecar source files to catkin_ws/src/racecar/src
 
 ##### Step 5: Compile
 
-The last step would be to compile the workspace
+The next step would be to compile the workspace. 
+This is done by going to the workspace root firectory (catkin_ws in our example), 
+and running ``` catkin_make ```. 
 
-Go to catkin_ws main folder and run
-```
-catkin_make
-```
+This will build all the packages in the workspace. 
 
+catkin_make has some other options such as building a specific package or forcing a re-build. 
+See documentation for more details. 
 
+##### Step 6: Running
 
-### ROS compilation flag
-In order to avoid code duplication, the ROS integration will be embedded in the RaceCar project under special 
-compilation flag: **ROS_COMPILATION**. 
+Last but not least, we would like to run the RaceCar node. 
+If you sourced the workspace, just run:
 
-If you used the above instruction for creating the racecar package, you will notice we added ROS_COMPILATION as a definition in the makefile.
+``` rosrun racecar racecar ```
 
-
-
-
-
+*Note:* The sourcing of a workspace is only valid for the current shell terminal, since one can have many workspaces (for example, a workspace for the Google Cartographer). 
+If you use a certain workspace frequently, it might me useful to add the source command to ```~/.bashrc```
 
 
 
@@ -279,15 +375,26 @@ If you used the above instruction for creating the racecar package, you will not
 ### Ros publisher
 
 This is a template class which serves as a simple wrapper for ROS topic publishing functionality. 
+The publisher is intergated to the main, non-ROS-native program as a class member. 
+The publisher object is comprised of 2 main components:
+	1. A FIFO memory buffer.
+	2. A thread which registers on the ROS system and publishes the FIFO content to a given ROS topic.  
+
+The implementation using a buffer is done is order to minimize the latency on the RaceCar 
+main thread. 
+
+The drawback is an increased latency in publishing a single message to ROS, since it has to go through the FIFO. 
+
+### Ros Odometer publisher
+
+This class is a derived type of the general ROS publisher which is intended for publishing odometer data. 
+
+In addition to being a child class of ros_publisher, this class also utilizes the TF 
+library to define and maintain different coordinate systems for the odometer, robot baselink
+and a static world frame-of-reference (i.e Lab starting point). 
 
 
 
-## Sensing HW used
-## Examples
-###### Code
-###### ROS launch of all components
-###### ROS compilation (create catkin ws, create makefile, compile)
-###### Some useful scripts
 
 ## Bibliography
 This section provides sources for more in-depth understanding of ROS
@@ -303,8 +410,7 @@ http://wiki.ros.org/catkin/CMakeLists.txt   -  How to create a Cmake file for ca
 
 ## TODO - delete after finishing
 - [] Ros launch
-- [] Add implementation-related documentation here or in the c file (for example publisher/listener)
+- [] Ros launch
 - [] Add info about ROS launch
 - [] Change RaceCar log prints to a wrapper function/macro and direct all log prints to ROS_LOG
 - [] Add a small section with "Get started" which runs rqt_launch and rqt_console and chooses different launch files
-- [] Add information about TF
