@@ -2,11 +2,11 @@
 
 
 
-This document provides a description of the integration between ROS and the RaceCar project, and will consist of 2 parts. 
+This document describes the integration the RaceCar project with ROS, and consists of 2 parts. 
 
-The first part would consist of a brief overview of the ROS system, its basic functionality and it's tools.
+The first part provides a brief overview of the ROS system, its basic functionality and its tools.
 
-The second part of this document will be more practical, and will include a guide to building with ROS (TODO: insert link) as well as a description of how ROS was integrated with RaceCar, along with the description of the wrapper API (TODO: insert link). 
+The second part is more practical, and will include a guide to building with ROS (TODO: insert link) as well as a description the RaceCar-ROS integration, along with the the wrapper API that were created. (TODO: insert link). 
 
 Please note that the use of ROS in optional, and may not be suitable for all use-cases. 
 
