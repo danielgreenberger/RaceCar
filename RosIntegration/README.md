@@ -444,10 +444,15 @@ If you use a certain workspace frequently, it might me useful to add the source 
 ### Ros publisher
 
 This is a template class which serves as a simple wrapper for ROS topic publishing functionality. 
+
 The publisher is intergated to the main, non-ROS-native program as a class member. 
+
 The publisher object is comprised of 2 main components:
+
 	1. A FIFO memory buffer.
+	
 	2. A thread which registers on the ROS system and publishes the FIFO content to a given ROS topic.  
+	
 
 The implementation using a buffer is done is order to minimize the latency on the RaceCar 
 main thread. 
