@@ -449,9 +449,9 @@ The publisher is intergated to the main, non-ROS-native program as a class membe
 
 The publisher object is comprised of 2 main components:
 
-	1. A FIFO memory buffer.
+1. A FIFO memory buffer.
 	
-	2. A thread which registers on the ROS system and publishes the FIFO content to a given ROS topic.  
+2. A thread which registers on the ROS system and publishes the FIFO content to a given ROS topic.  
 	
 
 The implementation using a buffer is done is order to minimize the latency on the RaceCar 
