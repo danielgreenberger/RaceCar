@@ -98,15 +98,6 @@ Other types can be found in third-party libraries or defined by the user.
 The messages in **common_msgs** are often used as the standard messages by many applications (i.e Google Cartographer), so it's better
 to try using them before re-inventing the wheel. 
 
-such as Pointcloud or Odometer data. 
-
-common_msgs
-
-Many message type definitions are available from ROS built-in libraries: std_msgs 
-
- , and the user may define 
-
-
 
 ### Packages and Workspaces
 
@@ -203,54 +194,38 @@ For more information: http://wiki.ros.org/rviz
 
 
 
-
-
-
-
-
-
+## ROS and the RaceCar project
 
 
 ### ROS integration with RaceCar
 
 Using RaceCar with the ROS framework has many advantages, as described above. 
 
-The goal is to provide an easy option to integrate ROS with the current RaceCar flows, 
-such that:
-1. The use will be as simplified as possible.
-2. Using ROS will be optional and not obligatory - we could always choose between ROS and regular mode
-3. Minimal change to the system in order to adapt it to ROS
+The goal was to provide an easy option to integrate ROS with the current RaceCar flows, which will be:
 
--- The use will be as simplified as possible.--
+1. Simple to use                  -  the use will be as simplified as possible.
+2. Simple to deploy               - we could always switch between ROS and another enviroment.
+3. Minimal change to RaceCar code - This is in order to avoid code duplication and increase portability. 
+
+#### Simple to use
 For this, wrapper classes and interfaces were created for ROS basic functionality. 
 
--- Using ROS will be optional and not obligatory --
+#### Simple to deploy
 The ROS integration code and definition is controlled by a preprocessor compilation flag, 
 which is only activated when compiling for ROS. 
-In ROS mode, the RealSense camera has a formal supported driver, making RaceCars wrapper classes redundant. 
-Therefore, all camera code and definition was placed under a compilation flag, which allows to disable it
-when we are using RaceCar with ROS, or for any other purpose. 
 
--- Minimal change to the system in order to adapt it to ROS --
 
-The best way to adapt RaceCar to ROS would be to make it moduler, by separating all RaceCar components (RealSense, Bitcraze, Chaos, etc.)
-into different execution nodes. 
-Alas, doing it this way will make it harder to maintain the project code for both ROS and non-ROS enviroments, and
-will complicate deploying the RaceCar in ROS. 
+#### Minimal change to RaceCar code
 
-Therefore, RaceCar will remain as one process, and will not be a ROS node by itself. 
-However, RaceCar will have objects which will register as ROS nodes (i.e publisher, see below). 
+The best way to adapt RaceCar to ROS would be to break it into differnt components (RealSense, Bitcraze, Chaos, etc.)
+and define each as a node.
+However, this approach has a drawback, as a modular approach will make it harder to maintain the project code for both ROS and non-ROS enviroments, as well
+as complicate the deployment of RaceCar under ROS. 
+
+As a compromise, we will keep the RaceCar process intact and use ROS through wrapper classes. This is discussed by the next section. 
 
 
 
-
-
-
-
-
-
-
-## ROS and the RaceCar project
 
 ### High Level Design overview
 
@@ -337,7 +312,7 @@ source catkin_ws/devel/setup.bash
 The next step would be to create a package for racecar inside the workspace we just created.
 
 ``` 
-catkin_create_pkg racecar roscpp std_msgs tf 
+catkin_create_pkg racecar roscpp common_msgs tf 
 ```
 
 catkin_create_pkg is a convenience script for creating a new package.
@@ -345,11 +320,11 @@ catkin_create_pkg is a convenience script for creating a new package.
 The first argument (racecar) is the name of the package, and the rest of the arguments are dependency packages - these are 
 packages racecar depends on for compilation/execution. 
 
-**roscpp**    -  This is the ROS c++ API library.
+**roscpp**       -  This is the ROS c++ API library.
 
-**std_msgs**  -  A package containing all standard ROS messages to be published to different topics
+**common_msgs**  -  A package containing all standard ROS messages to be published to different topics
 
-**tf**        -  A package responsible for keeping track of different coordinate systems.
+**tf**           -  A package responsible for keeping track of different coordinate systems.
 
 
 
@@ -491,20 +466,34 @@ and a static world frame-of-reference (i.e Lab starting point).
 
 
 ## Bibliography
+
 This section provides sources for more in-depth understanding of ROS
+
 ###### ROS reference links
+
+
 http://wiki.ros.org/roscpp/Overview - ROS c++ library -- documentation
 
 ###### Catkin
 
 http://wiki.ros.org/catkin/Tutorials - Catkin tutorial
+
 http://wiki.ros.org/catkin/Tutorials/using_a_workspace - Building a package with catkin_make
+
 http://wiki.ros.org/catkin/CMakeLists.txt   -  How to create a Cmake file for catkin
 
 
+
+
 ## TODO - delete after finishing
+
 - [] Ros launch
+
 - [] Ros launch
+
 - [] Add info about ROS launch
+
 - [] Change RaceCar log prints to a wrapper function/macro and direct all log prints to ROS_LOG
+
 - [] Add a small section with "Get started" which runs rqt_launch and rqt_console and chooses different launch files
+
