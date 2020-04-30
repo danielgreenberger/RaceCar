@@ -6,10 +6,10 @@
 
 ## Introduction
 
-This document will provide a short overview of ROS and its basic functionality and tools, 
-and how they are integrated into the RaceCar project. 
+This document will provide a short overview of ROS and its basic functionality and tools.
+We will also describe how the ROS enviroment was integrated into the RaceCar project. 
 
-The use of ROS in optional. 
+Please note thar the use of ROS in optional, and may not be suitable for all use-cases. 
 
 ### What is ROS
 ROS (Robot Operating System) is a set of tools and libraries which help software developers create robot applications.
@@ -19,6 +19,7 @@ Although ROS is not a real OS , it provides services which are typically provide
 > ROS is an open-source, meta-operating system for your robot. It provides the services you would expect from an operating system, including hardware abstraction, low-level device control, implementation of commonly-used functionality, message-passing between processes, and package management. It also provides tools and libraries for obtaining, building, writing, and running code across multiple computers. ROS is similar in some respects to 'robot frameworks,' such as Player, YARP, Orocos, CARMEN, Orca, MOOS, and Microsoft Robotics Studio.
 
 from: http://wiki.ros.org/ROS/Introduction
+
 
 ### ROS integration with RaceCar
 
@@ -65,18 +66,16 @@ as well as the option to use third-party drivers for some components (i.e RealSe
 ROS provides easy ways to communicate between different components of the system, including a built-in Publisher-Subscriber model.  
 
 ###### Complementary tools  
-ROS comes with many built-in and other useful tools which can be used on the platform, 
-including:
 
-- **Rviz** 				     - A 3D visualization tool for ROS.
-- **Rosbag**			     - A tools allowing to collect information published to ROS nodes and play them back later.
-- **TF**                     - lets the user keep track of multiple coordinate frames over time, by maintaining the relationship between different coordinate 
-						   frames and allows an easy transformation of points, vectors, etc. between coordinate frames at any desired point in time.
-- **Google Cartographer**    - A tool providing SLAM
-- **Intel RealSense driver** - Provides a wrapper for all RealSense funtionality and allows an easy use of the realsense device.
+
+
+
+
 
 
 ## ROS basic concepts
+
+
 
 ### Nodes
 
@@ -115,21 +114,31 @@ http://wiki.ros.org/catkin/Tutorials/create_a_workspace
 
 ## ROS basic tools
 
+ROS comes with many built-in and other useful tools which can be used on the platform, 
+including:
+
+
+
 ### Command line tools
+
+This group includes tools which are used for easily navigating the ROS filesystem, running nodes (TODO insert link) 
+and getting useful debug information. 
 
 A (very) partial list includes:
 
-roscd  - A tool offering an alternative to the 'cd' command in the terminal, allowing to switch directories by package name instead of absolute/relative path.
+- **roscd** 				 - A tool offering an alternative to the 'cd' command in the terminal, allowing to switch directories by package name instead of absolute/relative path.
 
-rosrun - Similarly to roscd, allows to **run** nodes from packages easily. 
+- **rosrun** 				 - Similarly to roscd, allows to **run** nodes from packages easily.
+
+- **rospack** 				 - A tool for retrieving information about ROS packages available on the filesystem. 
+
+- **rostopic** 				 - Display information about active ROS topics (i.e publish-frequency, listen to a topic, etc.)
+
+- **Rosbag**			     - A tool allowing to collect information published to ROS nodes and play them back later.
+
+**Note:** In order to use some of the tools you must source your catkin workspace. Check ROS documentation for more details. 
 
 
-rospack  -  A tool for retrieving information about ROS packages available on the filesystem. 
-
-
-rostopic  -  Display information about active ROS topics (i.e publish-frequency, listen to a topic, etc.)
-
-**Note** In order to use some of the tools you must source your catkin workspace. Check ROS documentation for more details. 
 
 ### Graphic tools
 
@@ -153,7 +162,10 @@ For more information: http://wiki.ros.org/rqt_console
 
 ##### rviz
 
-A graphic interface tool allowing to visualize a lot of useful information available from topic such as a robot path in different coordinate systems, maps, 
+A 3D visualization tool for ROS.
+rviz can be used to visualize a lot of useful information which is available from active topics. 
+
+Some examples include plotting a robot path in different coordinate systems, maps, 
 various camera data and more. 
 
 The link below contains detailed information about rviz, including tutorials for beginners.
@@ -161,7 +173,13 @@ The link below contains detailed information about rviz, including tutorials for
 For more information: http://wiki.ros.org/rviz
 
 
+### Other tools and libraries
 
+
+- **TF**                     - lets the user keep track of multiple coordinate frames over time, by maintaining the relationship between different coordinate 
+						       frames and allows an easy transformation of points, vectors, etc. between coordinate frames at any desired point in time.
+- **Google Cartographer**    - A tool providing Simultaneous localization and mapping (SLAM)
+- **Intel RealSense driver** - Provides a wrapper for all RealSense funtionality and allows an easy use of the realsense device.
 
 
 
@@ -244,12 +262,16 @@ mkdir -p catkin_ws/src
 ```
 
 If you want to use this workspace with various node tools, you will need to source it:
-``` source catkin_ws/devel/setup.bash ```
+```
+source catkin_ws/devel/setup.bash 
+```
 
 ##### Step 2: Creating the racecar package
 The next step would be to create a package for racecar inside the workspace we just created.
 
-``` catkin_create_pkg racecar roscpp std_msgs tf ```
+``` 
+catkin_create_pkg racecar roscpp std_msgs tf 
+```
 
 catkin_create_pkg is a convenience script for creating a new package.
 
@@ -350,7 +372,10 @@ Copy all of racecar source files to catkin_ws/src/racecar/src
 
 The next step would be to compile the workspace. 
 This is done by going to the workspace root firectory (catkin_ws in our example), 
-and running ``` catkin_make ```. 
+and running 
+``` 
+catkin_make 
+```
 
 This will build all the packages in the workspace. 
 
@@ -362,7 +387,9 @@ See documentation for more details.
 Last but not least, we would like to run the RaceCar node. 
 If you sourced the workspace, just run:
 
-``` rosrun racecar racecar ```
+``` 
+rosrun racecar racecar 
+```
 
 *Note:* The sourcing of a workspace is only valid for the current shell terminal, since one can have many workspaces (for example, a workspace for the Google Cartographer). 
 If you use a certain workspace frequently, it might me useful to add the source command to ```~/.bashrc```
