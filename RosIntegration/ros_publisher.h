@@ -13,11 +13,17 @@
 	The implementation using a buffer is done is order to minimize the latency on the RaceCar 
     main thread. 
     
+    The underlying container used for the FIFO is vector (using a deque interface), rather than a list. 
+    This is in order to use the spatial and temporal locality nature of the data access, as messages are published in a 
+    consecutive order.
+    
+    
     The drawback is an increased latency in publishing a single message to ROS, since it has to go through the FIFO. 
 
     TODOs:
     1. Extend to "RosInterface" and make Publisher a derived class, allowing to derive listener as well. 
     2. Add configuration for ROS buffering. 
+    3. Add custom exceptions indtead of using std::exception.
     
 */
 
@@ -42,7 +48,10 @@ using string = std::string;
 
 
 /* Debug printing */
-#define ROS_INTEGRATION_DEBUG_PRINT_ENABLE (0)  // 0 - Debug printing is OFF, 1 - Debug printing is ON
+#define ROS_INTEGRATION_DEBUG_PRINT_ENABLE (0)  // 0 - Debug printing is OFF, 
+                                                // 1 - Debug printing is ON
+
+
 
 #if (ROS_INTEGRATION_DEBUG_PRINT_ENABLE == 1)
 #define ROS_INTEGRATION_DEBUG_PRINT(text)       \
@@ -61,6 +70,10 @@ using string = std::string;
 /*
          Critical section macro. 
          Must only be used inside the Publisher class.
+         
+         A critical section is needed here, since the underlying container used for the FIFO is vector (using deque interface).
+         According to the standard, one needs to assume that any (addition / removal) of items may cause a mem-copy of the entire 
+         data which will invalidate all the existing iterators. 
 */
 #define ROS_PUBLISHER_CRITICAL_SECTION(code)   do{  __CRITICAL_SECTION(m_publisher_mutex, code)  } while(0);     
 
@@ -135,11 +148,11 @@ typedef enum : uint32_t
     OPTION_FLAG_WARN_ON_MAX_CAPACITY         = __BIT(3),  
     OPTION_FLAG_OVERRIDE_MAX_CAPACITY        = __BIT(4),  
 
+// TODO: other flags to maybe implement:
     // FLAG_PUBLISH_BUFFER_MSGS_ON_EXIT
     // RESERVE_MAX_BUFFER_SIZE
         
     OPTION_FLAG_MAX                          = __BIT(31), 
-   // TODO: implement OPTION_FLAG_DUMP_TO_FILE? Can also use rosbag for output.
 } option_flags_e;
 
 
@@ -178,7 +191,7 @@ private:
     
     
     // Mutex
-    std::mutex m_publisher_mutex;
+    std::mutex m_publisher_mutex; // See comment at critical-section macro about the need of the mutex.
     
     // Flags
     uint32_t m_flags;
@@ -251,13 +264,13 @@ public:
         /* Set node name */
         bool use_default_name = !is_flag_set(OPTION_FLAG_DEFINE_NODE_NAME);
         
-        if (use_default_name) // TODO: bug, we need to remove "/" from name
+        if (use_default_name) 
         {
             m_node_name = DEFAULT_NAME_PREFIX + m_topic_name;
         }
         else
         {
-            ASSERT(node_name.size() > 0, std::exception()); // TODO: make custon exception
+            ASSERT(node_name.size() > 0, std::exception()); 
             m_node_name = node_name;
         }
         
@@ -338,19 +351,20 @@ public:
     
     
     /*=======================================================
-    * @brief           TODO
+    * @brief           Start the publisher
     *
-    * @description     TODO
+    * @description     This function starts a separate thread which publishes available messages from the FIFO 
+    *                  to the ROS topic defined at initialization.
     *
-    * @param           TODO
+    * @param           None.
     *
-    * @return          TODO
+    * @return          None.
     *
-    * @author          TODO
+    * @author          Daniel Greenberger
     =========================================================*/
     void start()
     {
-        ASSERT(false == m_is_active, std::exception()); // TODO: add exception
+        ASSERT(false == m_is_active, std::exception());  
         
         ROS_INTEGRATION_DEBUG_PRINT(" start :: Starting ROS publisher thread ");
         m_is_active = true;
@@ -359,29 +373,32 @@ public:
     
     
     /*=======================================================
-    * @brief           TODO
+    * @brief           Stop the publisher
     *
-    * @description     TODO
+    * @description     This function stops the publisher thread. 
+    *                  Any messages remaining on the FIFO will be discarded.
     *
-    * @param           TODO
+    * @param           None.
     *
-    * @return          TODO
+    * @return          None.
     *
-    * @author          TODO
+    * @author          Daniel Greenberger
     =========================================================*/
     void stop()
     {
-        // Check if publisher is already off
+        /* Check if publisher is already off */
         if (!m_is_active)
         {
             ROS_INTEGRATION_DEBUG_PRINT("stop :: Publisher is already off!");
             return;
         }
         
-        // Mark the thread to stop execution
+        
+        /* Mark the thread to stop execution */
         m_is_active = false;
         
-        // Wait for the publisher to finish processing current message
+        
+        /* Wait for the publisher to finish processing current message */
         ROS_INTEGRATION_DEBUG_PRINT("stop :: waiting for thread.");
         m_ros_node_thread.join();
         ROS_INTEGRATION_DEBUG_PRINT("stop :: Thread has halted.");
@@ -494,7 +511,7 @@ protected:
     *
     * @author          Daniel Greenberger
     =========================================================*/
-    bool active() // TODO: maybe name it can_publish()?
+    bool active() 
     {
         return _Usually(m_is_active && ros::ok );
     }
@@ -502,15 +519,7 @@ protected:
     
     
     /*=======================================================
-    * @brief           TODO
-    *
-    * @description     TODO
-    *
-    * @param           TODO
-    *
-    * @return          TODO
-    *
-    * @author          TODO
+    * @brief           Get the ROS topic of this publisher
     =========================================================*/
     const std::string get_topic_name()
     {
@@ -589,11 +598,9 @@ protected:
         ros::Publisher node_publisher = node_handler.advertise<T>(m_topic_name, m_max_queue_size);
 
         
-        
         /* Define publish frequency */
         ros::Rate loop_rate(ROS_PUBLISH_RATE_PER_SECOND);
 
-        
         
         /* Publish */
         int count = 0;
