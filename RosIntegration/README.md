@@ -4,9 +4,9 @@
 
 This document describes the integration the RaceCar project with ROS, and consists of 2 parts. 
 
-The [first part](#introduction) provides a brief overview of the ROS system, its basic functionality and its tools.
+The [first part](#introduction) provides a brief overview of the ROS system, its basic functionality and its tools. It also includes an high-level description of the [RaceCar-ROS integration](#ros-and-the-racecar-project) 
 
-The [second part](#getting-started) is more practical, and includes a guide to [building with ROS](#creating-catkin-workspace-and-package) as well as a description the RaceCar-ROS integration, along with the the [wrapper API that was created.](#RaceCar-RosIntegration-API). 
+The [second part](#getting-started) is more practical, and includes a guide to [building with ROS](#creating-catkin-workspace-and-package) as well as a description of the [wrapper API](#RaceCar-RosIntegration-API)  that was created. 
 
 Please note that the use of ROS in optional, and may not be suitable for all use-cases. 
 
