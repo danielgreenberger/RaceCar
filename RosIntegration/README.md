@@ -55,9 +55,7 @@ ROS has a growing and thriving community which develops many useful tools.
 Some tools come shipped with ROS, but many other open-source libraries can be downloaded and used. 
 
 This document briefly discusses some of the important libraries, but many others can be found at the 
-ROS official website:
-http://wiki.ros.org/
-https://index.ros.org/packages/
+[ROS official website](https://index.ros.org/packages/)
 
 
 
@@ -108,9 +106,7 @@ from: http://wiki.ros.org/Packages
 
 A workspace is a collection of packages, organized using a built-in tool called **catkin**.
 
-To begin creating code for ROS using catkin, it is useful to read the following tutorial:
-
-http://wiki.ros.org/catkin/Tutorials/create_a_workspace
+To begin creating code for ROS using catkin, it is useful to read the [following tutorial](http://wiki.ros.org/catkin/Tutorials/create_a_workspace).
 
  
 
@@ -270,8 +266,7 @@ For other platform, we don't define this flag and therefore all the ROS-related 
 
 If set, all the realsense-related code of RaceCar is redacted by the compiler. 
 
-This flag is needed when we want to use the official realsense driver for ROS:
-https://github.com/IntelRealSense/realsense-ros
+This flag is needed when we want to use the [official realsense driver for ROS](https://github.com/IntelRealSense/realsense-ros)
 
 When the offical driver is used, it is run as a separate node to RaceCar and manages the camera, 
 and therefore we need to disable our RaceCar camera API. 
@@ -285,8 +280,7 @@ the RaceCar camera API in the usual way.
 
 ### ROS installation
 First, make sure that you have ROS installed on your system.
-ROS installation guide can be found at:
-http://wiki.ros.org/ROS/Installation
+ROS installation guide can be found [here](http://wiki.ros.org/ROS/Installation).
 
 The next step would be to create a workspace and package using catkin
 
@@ -491,10 +485,6 @@ http://wiki.ros.org/catkin/CMakeLists.txt   -  How to create a Cmake file for ca
 
 
 ## TODO - delete after finishing
-
-- [] Ros launch
-
-- [] Ros launch
 
 - [] Add info about ROS launch
 
