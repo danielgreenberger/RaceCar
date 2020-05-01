@@ -122,22 +122,20 @@ public:
 //                           Publisher interface functions
 //--------------------------------------------------------------------------
 
-/*=======================================================
-* @brief           TODO
-*
-* @description     TODO
-*
-* @param           TODO
-*
-* @return          TODO
-*
-* @author          TODO
-=========================================================*/
-void publish(const Flow& odom_data)
-{
-    nav_msgs::Odometry ros_odom = convert_to_ros_odom(odom_data);
-    Publisher::publish(ros_odom);
-}
+    /*=======================================================
+    * @brief           Convert Bitcraze o0dometry message to ROS odometry and publish to topic.
+    *
+    * @param           odom_data  -  Odometry data in Bitcraze format.
+    *
+    * @return          None.
+    *
+    * @author          Daniel Greenberger
+    =========================================================*/
+    void publish(const Flow& odom_data)
+    {
+        nav_msgs::Odometry ros_odom = convert_to_ros_odom(odom_data);
+        Publisher::publish(ros_odom);
+    }
 
 //--------------------------------------------------------------------------
 //                           Publisher internal functions
@@ -164,9 +162,11 @@ private:
         /* Register to publish for topic */
         ros::Publisher node_publisher = node_handler.advertise<nav_msgs::Odometry>(this->get_topic_name(), 100);
 
+
         /* Init TF publisher and listener */
         m_p_listener = std::make_shared<tf::TransformListener> (ros::Duration(10));
-        m_p_static_broadcaster = std::make_shared<tf::TransformBroadcaster> ();  // TODO: publisher/listener should belong to node
+        m_p_static_broadcaster = std::make_shared<tf::TransformBroadcaster> ();  
+        
         
         /* Define publish frequency */
         ros::Rate publisher_rate_per_second(10);
@@ -177,14 +177,12 @@ private:
         int count = 0;
         while ( this->active() )
         {
-            
-           
+            // Publish  [Odometer => Base]  frame transformation 
             publish_static_transforms();
             
             // Pull a message from FIFO
             nav_msgs::Odometry msg;
             bool msg_exists = this->pull_message_if_exists(msg);
-            
                 
             // Publish
             if (msg_exists)
@@ -194,7 +192,6 @@ private:
                 node_publisher.publish(msg);
                 ros::spinOnce();
             }
-
 
             // Wait for next publish interval 
             publisher_rate_per_second.sleep();
@@ -326,7 +323,7 @@ private:
 
 
 //--------------------------------------------------------------------------
-//                           Publisher interface functions
+//                           debug functions functions
 //--------------------------------------------------------------------------
 //      void transformPoint()
 //      {
