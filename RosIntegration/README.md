@@ -444,7 +444,7 @@ If you sourced the workspace, just run:
 rosrun racecar racecar 
 ```
 
-*Note:* The sourcing of a workspace is only valid for the current shell terminal, since one can have many workspaces (for example, a workspace for the Google Cartographer). 
+**Note:** The sourcing of a workspace is only valid for the current shell terminal, since one can have many workspaces (for example, a workspace for the Google Cartographer). 
 If you use a certain workspace frequently, it might me useful to add the source command to ```~/.bashrc```
 
 
