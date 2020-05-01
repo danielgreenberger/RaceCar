@@ -240,9 +240,7 @@ In order to archive this balance, the following design decisions were made:
 
    To be more exact, although it is run as a node (=ROS process), it doesn't register as a node is the ROS system and
    therefore doesn't have a name. 
-   
    The reason is again portability, as we aimed to mask out ROS specific details from the RaceCar interface. 
-   
    Instead, every instance created from the wrapper classes (i.e [RosIntegration::Publisher](#ros-publisher)) registers as a names node, 
    and all interaction with ROS is done through those wrapper classes. 
 
@@ -274,7 +272,7 @@ For other platform, we don't define this flag and therefore all the ROS-related 
 
 If set, all the realsense-related code of RaceCar is redacted by the compiler. 
 
-This flag is needed when we want to use the [official realsense driver for ROS](https://github.com/IntelRealSense/realsense-ros)
+This flag is needed when we want to use the [official realsense driver for ROS.](https://github.com/IntelRealSense/realsense-ros)
 
 When the offical driver is used, it is run as a separate node to RaceCar and manages the camera, 
 and therefore we need to disable our RaceCar camera API. 
@@ -289,6 +287,10 @@ the RaceCar camera API in the usual way.
 ### ROS installation
 First, make sure that you have ROS installed on your system.
 ROS installation guide can be found [here](http://wiki.ros.org/ROS/Installation).
+
+**Note:** The version used when developing the integration was ROS melodic, 
+although it is safe to assume that other versions can be used. 
+
 
 The next step would be to create a workspace and package using catkin
 
