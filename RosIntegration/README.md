@@ -42,12 +42,12 @@ This is very helpful since many times the different components of the robot (whi
 are loosely related to each other. 
 
 Such modular approach can also be easier to design and for debugging.  
-It also gives us the option to integrate third-party libraries for our components, such as the RealSense ROS driver (TODO insert a link).
+It also gives us the option to integrate third-party libraries for our components, such as the [RealSense ROS driver](https://github.com/IntelRealSense/realsense-ros).
 
 
 ###### infrastructure 
 
-ROS provides a built-in infrastructure which answers the needs of many robot system, such as it's Publish-Subscriber model of messages and topic (TODO insert link).  
+ROS provides a built-in infrastructure which answers the needs of many robot system, such as it's Publish-Subscriber model of [messages and topics](#Messages-and-Topics).  
 
 
 ###### Complementary tools  
@@ -126,7 +126,7 @@ including:
 
 ### Command line tools
 
-This group includes tools which are used for easily navigating the ROS filesystem, running nodes (TODO insert link) 
+This group includes tools which are used for easily navigating the ROS filesystem, running [nodes](#Nodes) 
 and getting useful debug information. 
 
 A (very) partial list includes:
@@ -261,7 +261,7 @@ In order to avoid code duplication, some of the functionality was put under #ifd
 ##### ROS_COMPILATION
 
 All ROS-related code and definition (including the wrapper classes) will be put under this flag.  
-When creating the cmake for the ROS build (TODO insert link) we add the ROS_COMPILATION flag to include the
+When [creating the cmake for the ROS build](#step-3-makefile-configuration) we add the ROS_COMPILATION flag to include the
 RosIntegration libraries. 
 
 For other platform, we don't define this flag and therefore all the ROS-related code is redacted by the compiler. 
