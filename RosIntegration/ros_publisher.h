@@ -72,7 +72,7 @@ using string = std::string;
          Must only be used inside the Publisher class.
          
          A critical section is needed here, since the underlying container used for the FIFO is vector (using deque interface).
-         According to the standard, one needs to assume that any (addition / removal) of items may cause a mem-copy of the entire 
+         According to the C++ standard, the user of vector has to assume that any (addition / removal) of items may cause a mem-copy of the entire 
          data which will invalidate all the existing iterators. 
 */
 #define ROS_PUBLISHER_CRITICAL_SECTION(code)   do{  __CRITICAL_SECTION(m_publisher_mutex, code)  } while(0);     
