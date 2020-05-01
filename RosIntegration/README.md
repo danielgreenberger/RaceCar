@@ -289,7 +289,7 @@ First, make sure that you have ROS installed on your system.
 ROS installation guide can be found [here](http://wiki.ros.org/ROS/Installation).
 
 **Note:** The version used when developing the integration was ROS melodic, 
-although it is safe to assume that other versions can be used. 
+but it is safe to assume that other supported version can be used. 
 
 
 The next step would be to create a workspace and package using catkin
