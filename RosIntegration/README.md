@@ -288,8 +288,15 @@ the RaceCar camera API in the usual way.
 First, make sure that you have ROS installed on your system.
 ROS installation guide can be found [here](http://wiki.ros.org/ROS/Installation).
 
+It is better to install the **Desktop-Full** version as it contains useful tools such as [rviz](#rviz)
+
 **Note:** The version used when developing the integration was ROS melodic, 
 but it is safe to assume that other supported version can be used. 
+
+
+It is also recommended to install the [realsense driver for ROS.](https://github.com/IntelRealSense/realsense-ros).
+It may be better to install it as a package (rather than compile locally from sources), so it can be used from any catkin workspace. 
+
 
 
 The next step would be to create a workspace and package using catkin
