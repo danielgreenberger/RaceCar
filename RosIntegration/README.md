@@ -230,12 +230,20 @@ The main idea was to create an easy-to-use interface of ROS, while still allowin
 In order to archive this balance, the following design decisions were made:
 
 1. The use of ROS funtionality is done through wrapper classes which were developed for this project (currently only a publisher class is available). 
-   Those classes expose a very simple interface, keeping the ROS-specific details to the internal implementation. 
-   This way it will be easier in the future to port the code to other platforms. 
-2. The RaceCar process itself is not a ROS node. To be more exact, although it's technically run as a node, it doesn't register as a node is the ROS system and
+   
+   These classes expose a very simple interface, keeping the ROS-specific details to the internal implementation. 
+   
+   This makes it easier for a future implementation to port the code to another platforms. 
+   
+   
+2. The RaceCar process itself is not a ROS node. 
+
+   To be more exact, although it is run as a node (=ROS process), it doesn't register as a node is the ROS system and
    therefore doesn't have a name. 
+   
    The reason is again portability, as we aimed to mask out ROS specific details from the RaceCar interface. 
-   Instead, every instance created from the wrapper classes (i.e RosIntegration::Publisher) registers as a names node, 
+   
+   Instead, every instance created from the wrapper classes (i.e [RosIntegration::Publisher](#ros-publisher)) registers as a names node, 
    and all interaction with ROS is done through those wrapper classes. 
 
 
