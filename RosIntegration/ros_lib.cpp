@@ -3,11 +3,6 @@
 #ifdef ROS_COMPILATION
 
 
-
-// RosIntegration
-
-
-// RealSense API
 #include "RealSenseAPI.h" 
 
 #ifndef NO_CAMERA
@@ -28,9 +23,6 @@ namespace RosIntegration
 
 CAMERA_DEFINITION
 (
-    // dgreenbe TODO explain
-    static const std::string tf_realsense_frame_id = "map";
-
 
     // dgreenbe todo check if struct exists else where
     typedef struct
@@ -48,18 +40,7 @@ CAMERA_DEFINITION
 
 CAMERA_DEFINITION
 (
-    /*=======================================================
-    * @brief           TODO
-    *
-    * @description     TODO
-    *
-    * @param           TODO
-    *
-    * @return          TODO
-    *
-    * @author          TODO
-    =========================================================*/
-    // dgreenbe todo inline
+
     static inline uint8_t* GetColorPixel(const rs2::video_frame color_frame, const rs2::texture_coordinate* texture_point)
     {
         ASSERT(texture_point, std::exception());

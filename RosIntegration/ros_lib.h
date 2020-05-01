@@ -37,13 +37,9 @@ namespace RosIntegration
 {
 
 	
-/*
-dgreenbe TODO:
-    1. Make this a conversion function from RealSense point cloud into ROS point cloud
-
-*/
 
 #ifndef NO_CAMERA
+#warn "The outout of PointCloudConversion has not been verified."
     /*=======================================================
     * @brief           Converts RealSense pointcloud to ROS PointCloud2 message
     *
