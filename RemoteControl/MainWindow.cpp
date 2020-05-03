@@ -8,6 +8,8 @@
 #include "Chaos_types.h"
 #include "RemoteControl_types.h"
 
+#include <cmath>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -284,7 +286,7 @@ void MainWindow::updateOpticalFlow(const Flow &flow)
     ui->vy->setText(QString::number(vy, 'f', 3));
 }
 
-void MainWindow::updateEulerAngles(const Camera::EulerAngles &angles)
+void MainWindow::updateEulerAngles(const Camera::AngularVelocities &angles)
 {
     ui->psi->setText(QString::number(static_cast<real64>(angles.x_pitch), 'f', 3));
     ui->theta->setText(QString::number(static_cast<real64>(angles.y_yaw), 'f', 3));

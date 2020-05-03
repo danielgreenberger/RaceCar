@@ -54,7 +54,7 @@ private:
     void cameraThread();
     void updateImage(const QImage &image);
     void updateOpticalFlow(const Flow &flow);
-    void updateEulerAngles(const Camera::EulerAngles &angles);
+    void updateEulerAngles(const Camera::AngularVelocities &angles);
     void updateAccelometer(const Camera::AccelData &accel_data);
     void update(const QImage &image, const Chaos::ColorPacket &packet);
     Chaos::header readHeader();

@@ -793,6 +793,7 @@ moc_MainWindow.cpp: ../../Qt5.10.1/5.10.1/gcc_64/include/QtWidgets/QMainWindow \
 		../../Qt5.10.1/5.10.1/gcc_64/include/QtCore/qtimer.h \
 		../../Qt5.10.1/5.10.1/gcc_64/include/QtCore/qbasictimer.h \
 		../TcpClient/ITcpClient.h \
+		../Common/Utils/basic_utils.h \
 		../TcpClient/TcpClient_types.h \
 		../TcpServer/ITcpServer.h \
 		../TcpServer/TcpServer_types.h \
