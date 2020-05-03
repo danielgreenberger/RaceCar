@@ -97,7 +97,7 @@ inline double get_angle_from_linear_offset(const double Dx, const double Dy)
                                 Y'   (Perpendicular to X')                                   					 
                       
 
-                      
+        According to the diagram above:
                                                               					 
         X = X' * cos(t)  -  Y' * sin(t)
 `       Y = X' * sin(t)  +  Y' * cos(t)        
