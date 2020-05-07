@@ -183,6 +183,10 @@ inline std::string MARK_UNDERSCORE(std::string text)
 
 
 
+/*=======================================================
+* @brief           Print a variable to standard output (boot, int, etc..)
+=========================================================*/
+
 #define DBG_PRINT(var)                                                                                  \
 do                                                                                                                    \
 {                                                                                                                     \

@@ -74,6 +74,7 @@ class OdometerPublisher : public Publisher<nav_msgs::Odometry>
 struct OdometerData
 {
      // TODO: we must protect against overflow or wraparound
+     // TODO: make sure we only start publishing when we get actual odometer info (from bitcraze)
     
     /* Robot offset in X-Y  lab frame */
     double total_dist_x = 0;    

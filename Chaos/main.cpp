@@ -12,7 +12,7 @@
 int main() {
     std::cout << " PID: " << getpid() << std::endl;
     RaceCar car;
-    car.connect("132.68.36.138",5555,"132.68.36.107");
+    car.connect("192.168.1.124",5555,"192.168.71.18");
     car.run();
 
     std::cout << " ok" << std::endl;
