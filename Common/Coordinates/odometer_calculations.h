@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <utility>
+#include <tuple>
 #include "bitcraze_types.h"
 
 namespace OdometerTransform
@@ -120,7 +121,7 @@ inline double get_angle_from_linear_offset(const double Dx, const double Dy)
 *
 * @description     See the diagram above which justifies the calculation. 
 *
-* @param           t  -  The angle by which X' and Y'  are rotated  
+* @param           t  -  The angle (radians) by which X' and Y'  are rotated  
 *
 * @param           r_Dx   -  The distance in X' units
 *
@@ -130,8 +131,7 @@ inline double get_angle_from_linear_offset(const double Dx, const double Dy)
 *
 * @author          Daniel Greenberger
 =========================================================*/
-using DistXY = std::pair<double,double>;
-inline DistXY convert_dist_to_lab_frame (const double t, const double r_Dx, const double r_Dy)
+inline std::pair<double,double> rotate_by_angle (const double t, const double r_Dx, const double r_Dy)
 {
     const double dx = r_Dx*cos(t) - r_Dy*sin(t);
     const double dy = r_Dx*sin(t) + r_Dy*cos(t);
@@ -193,7 +193,7 @@ inline double MILISECOND_TO_SECOND(const double x_ms)
 *
 * @author          Daniel Greenberger
 =========================================================*/
-inline const OdometerDataUnit convert_to_metric_units(const Flow& bitcraze_input)
+inline OdometerDataUnit convert_to_metric_units(const Flow& bitcraze_input)
 {
     const double dx_pixels = static_cast<double>(bitcraze_input.deltaX);
     const double dy_pixels = static_cast<double>(bitcraze_input.deltaY);
@@ -216,6 +216,41 @@ inline const OdometerDataUnit convert_to_metric_units(const Flow& bitcraze_input
     return metric_data;
     
 }
+
+
+/*=======================================================
+* @brief           Converts odometer data to the lab frame
+*
+* @param           t  -  The angle between the robot orientation and the lab frame (z-axis)
+*
+* @param           odom_frame_data   -  Odometer data in the current frame of the device (may be rotated to the lab)
+*
+* @return          The same odometer data unit rotated by t
+*
+* @author          Daniel Greenberger
+=========================================================*/
+inline OdometerDataUnit convert_odom_to_lab_frame (const double t, const OdometerDataUnit odom_frame_data)
+{
+    OdometerDataUnit lab_frame_data;
+    
+    /* Rotate distance */
+    std::tie( lab_frame_data.dx__meters, lab_frame_data.dy__meters) 
+                = rotate_by_angle(t, odom_frame_data.dx__meters, odom_frame_data.dy__meters);
+                
+    /* Rotate velocity */
+    std::tie( lab_frame_data.vx__meters_p_sec, lab_frame_data.vy__meters_p_sec) 
+                = rotate_by_angle(t, odom_frame_data.vx__meters_p_sec, odom_frame_data.vy__meters_p_sec);  
+    
+
+    /* Time and range are copied */
+    lab_frame_data.z_range__meters = odom_frame_data.z_range__meters; // We assume the orientation changes only in the x-y direction
+    lab_frame_data.dt__sec         = odom_frame_data.dt__sec;
+
+
+    
+    return lab_frame_data;
+}
+
 
 
 

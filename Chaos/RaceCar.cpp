@@ -104,9 +104,9 @@ RaceCar &RaceCar::connect(const string& ip, const unsigned short& port,const str
     std::cout << "enter conect()" <<std::endl;
 
     
-    /* Start Camera */
     CAMERA_CODE_SECTION
     (
+        /* Start Camera */
         if(_camera.connectCamera() && _camera.isConnect())
         {
             _is_cammera_connected = true;
@@ -116,22 +116,22 @@ RaceCar &RaceCar::connect(const string& ip, const unsigned short& port,const str
         {
             std::cout << "Camera NOT CONNECTED" <<std::endl;
         }
-    )
 
     
     
-    /* Start TCP client to remote host -- For sending RealSense sensors data */
-    _tcp_client->connect(ip, port);
-    
-    if(_tcp_client->isConnected())
-    {
-        _is_tcp_client_connected = true;
-        std::cout << "connected to sever" <<std::endl;
-    } 
-    else 
-    {
-        std::cout << "server NOT CONNECTED" <<std::endl;
-    }
+        /* Start TCP client to remote host -- For sending RealSense sensors data */
+        _tcp_client->connect(ip, port);
+        
+        if(_tcp_client->isConnected())
+        {
+            _is_tcp_client_connected = true;
+            std::cout << "connected to sever" <<std::endl;
+        } 
+        else 
+        {
+            std::cout << "server NOT CONNECTED" <<std::endl;
+        }
+    )
 
 
 
@@ -526,7 +526,8 @@ RaceCar &RaceCar::getBitCrazeOutput()
         /* ROS ONLY  -- Publish topic */
         ROS_CODE_SECTION
         (
-            _p_odom_publisher->publish(flow_data);
+            auto metric_odom_data = OdometerTransform::convert_to_metric_units(flow_data);
+            _p_odom_publisher->update_odometer_data(metric_odom_data);
         )
 
 

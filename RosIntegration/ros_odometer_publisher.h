@@ -76,18 +76,25 @@ struct OdometerData
      // TODO: we must protect against overflow or wraparound
     
     /* Robot offset in X-Y  lab frame */
-    double translation__x = 0;    
-    double translation__y = 0;
+    double total_dist_x = 0;    
+    double total_dist_y = 0;
     
-    /* Robot rotation relative to X-Y lab avis */
-    double rotation_z_axis = 0;
+    /* Robot rotation relative to X-Y lab axis */
+    double total_rotation_z_axis = 0;
     
-    /* Current height  -  no effect on robot rotation */
-    double curr_height_z = 0;
+    /* Current height of the sensor from the ground in meters  -  no effect on robot rotation */
+    double current_z_range = 0;
+    
+    /* Current speed */
+    double current_speed_x = 0;  /* Speed in the X direction (m/s) */
+    double current_speed_y = 0;  /* Speed in the Y direction (m/s) */
     
     /* time */
-    ros::Time last_update_tsf;
+    ros::Time last_update_timestamp;
 };
+
+
+
 //--------------------------------------------------------------------------
 //                             Members
 //--------------------------------------------------------------------------
@@ -143,9 +150,7 @@ public:
 
     void publish(const Flow& odom_data) = delete;
     
-    
-    
-    
+
 
 //--------------------------------------------------------------------------
 //                           Publisher interface functions
@@ -155,7 +160,7 @@ public:
     
     
    /*=======================================================
-    * @brief           Updates the accumelated distance and rotation according to the new Bitcraze packet
+    * @brief           Updates the accumelated distance and rotation according to the new Odometer data unit
     *
     * @param           odom_data  -  Odometry in Bitcraze format
     *
@@ -163,36 +168,36 @@ public:
     *
     * @author          Daniel Greenberger
     =========================================================*/
-    void update_odometer_data(const  Flow& odom_data)
+    void update_odometer_data(const OdometerTransform::OdometerDataUnit& odom_data)
     {
         /* Get current time */
         const auto curr_time = ros::Time::now();
         
 
         /* Calculate added rotation around the z-axis */
-        const double rotation_z_diff =  OdometerTransform::get_angle_from_linear_offset(odom_data.deltaX, odom_data.deltaY);
-        
+        const double rotation_z_diff =  OdometerTransform::get_angle_from_linear_offset(odom_data.dx__meters, odom_data.dy__meters);
+
         
         /* Calculate added distance offset */
-            // Note we are using the old rotation parameter to calculate the current offset.
-            // This is because the current offset is the cause of the rotation.
-            //
-            // Since we assume deltaX, deltaY are small we can neglect the error 
-            // arising from the fact that the change of the rotation is continous
-            // TODO: maybe explain better
-        const OdometerTransform::DistXY dist_offset = OdometerTransform::convert_dist_to_lab_frame(
-                                                                                                   m_last_odom_snapshot.rotation_z_axis, 
-                                                                                                   odom_data.deltaX, 
-                                                                                                   odom_data.deltaY
-                                                                                                   );  
-           
-        /* Update */
+        OdometerTransform::OdometerDataUnit odom_lab_data;
         ODOMETER_CRITICAL_SECTION
         (
-            m_last_odom_snapshot.translation__x += dist_offset.first;
-            m_last_odom_snapshot.translation__y += dist_offset.second;
-            m_last_odom_snapshot.last_update_tsf = curr_time;
-            m_last_odom_snapshot.rotation_z_axis += rotation_z_diff;
+            
+                // Note we are using the old rotation parameter to calculate the current offset.
+                // This is because the current offset is the cause of the rotation.
+                //
+                // Since we assume deltaX, deltaY are small we can neglect the error 
+                // arising from the fact that the change of the rotation is continous
+                // TODO: maybe explain better
+             
+                 odom_lab_data = OdometerTransform::convert_odom_to_lab_frame( m_last_odom_snapshot.total_rotation_z_axis,  odom_data);  
+               
+               
+            /* Update */
+            m_last_odom_snapshot.total_dist_x += odom_lab_data.dx__meters;
+            m_last_odom_snapshot.total_dist_y += odom_lab_data.dy__meters;
+            m_last_odom_snapshot.last_update_timestamp = curr_time;
+            m_last_odom_snapshot.total_rotation_z_axis += rotation_z_diff;
         )
         
     }
@@ -243,11 +248,12 @@ private:
             OdometerData snapshot;
             ODOMETER_CRITICAL_SECTION
             (
-                snapshot.translation__x  = m_last_odom_snapshot.translation__x; 
-                snapshot.translation__y  = m_last_odom_snapshot.translation__y;
-                snapshot.rotation_z_axis = m_last_odom_snapshot.rotation_z_axis;
-                snapshot.curr_height_z   = m_last_odom_snapshot.curr_height_z;
-                snapshot.last_update_tsf = m_last_odom_snapshot.last_update_tsf;
+//                  snapshot.translation__x  = m_last_odom_snapshot.translation__x; 
+//                  snapshot.translation__y  = m_last_odom_snapshot.translation__y;
+//                  snapshot.rotation_z_axis = m_last_odom_snapshot.rotation_z_axis;
+//                  snapshot.curr_height_z   = m_last_odom_snapshot.curr_height_z;
+//                  snapshot.last_update_tsf = m_last_odom_snapshot.last_update_tsf;
+                    snapshot = m_last_odom_snapshot;
             )
             
             // Publish TF transforms
@@ -333,23 +339,27 @@ private:
     *
     * @author          Daniel Greenberger
     =========================================================*/
-    nav_msgs::Odometry get_odom_to_lab_topic_msg(const  OdometerData snapshot)
+    nav_msgs::Odometry get_odom_to_lab_topic_msg(const OdometerData& snapshot)
     {
         
         /* Build ROS odometry msg */
         nav_msgs::Odometry odom;
         
-        const geometry_msgs::Quaternion rotation = tf::createQuaternionMsgFromYaw(snapshot.rotation_z_axis);
-        
-        odom.header.stamp = m_last_odom_snapshot.last_update_tsf;
+        odom.header.stamp = snapshot.last_update_timestamp;
         
         odom.header.frame_id = ODOMETER_FRAME_ID;
         odom.child_frame_id = LAB_FRAME_ID;
         
-        odom.pose.pose.position.x = snapshot.translation__x;
-        odom.pose.pose.position.y = snapshot.translation__y;
-        odom.pose.pose.position.z = snapshot.curr_height_z;
-        odom.pose.pose.orientation = rotation;
+        odom.pose.pose.position.x = snapshot.total_dist_x;
+        odom.pose.pose.position.y = snapshot.total_dist_y;
+        odom.pose.pose.position.z = snapshot.current_z_range;
+
+        odom.twist.twist.linear.x = snapshot.current_speed_x;
+        odom.twist.twist.linear.y = snapshot.current_speed_y;
+
+        // TODO: add angular velocity
+        
+        odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(snapshot.total_rotation_z_axis);;
         
         return odom;
         
@@ -371,16 +381,16 @@ private:
 
         geometry_msgs::TransformStamped odom_trans;
         
-        ros::Time curr_time = m_last_odom_snapshot.last_update_tsf;
+        ros::Time curr_time = m_last_odom_snapshot.last_update_timestamp;
         odom_trans.header.stamp = curr_time;
         
         odom_trans.header.frame_id = ODOMETER_FRAME_ID;
         odom_trans.child_frame_id = LAB_FRAME_ID;
         
-        odom_trans.transform.translation.x = snapshot.translation__x;
-        odom_trans.transform.translation.y = snapshot.translation__y;
-        odom_trans.transform.translation.z = snapshot.curr_height_z;
-        odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(snapshot.rotation_z_axis);
+        odom_trans.transform.translation.x = snapshot.total_dist_x;
+        odom_trans.transform.translation.y = snapshot.total_dist_y;
+        odom_trans.transform.translation.z = snapshot.current_z_range;
+        odom_trans.transform.rotation = tf::createQuaternionMsgFromYaw(snapshot.total_rotation_z_axis);
 
         return odom_trans;
     }
