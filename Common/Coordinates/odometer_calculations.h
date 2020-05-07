@@ -3,9 +3,14 @@
 
 #include <cmath>
 #include <utility>
+#include "bitcraze_types.h"
 
 namespace OdometerTransform
 { 
+
+//----------------------------------------------------------------------------------------------------------------------
+//                                             Rotational transforms
+//----------------------------------------------------------------------------------------------------------------------
 /*
 					
 					Calculation:  Rotation by t from Bitcraze linear data
@@ -134,7 +139,90 @@ inline DistXY convert_dist_to_lab_frame (const double t, const double r_Dx, cons
     return std::make_pair(dx,dy);
 }
 
- 
+
+
+
+
+//----------------------------------------------------------------------------------------------------------------------
+//                                       Velocity and Distance cauculations
+//----------------------------------------------------------------------------------------------------------------------
+
+struct OdometerDataUnit
+{
+    double dx__meters;  /* Distance travelled (meters) in the X direction */
+    double dy__meters;  /* Distance travelled (meters) in the Y direction */
+    
+    double vx__meters_p_sec;  /* Speed in the X direction (m/s) */
+    double vy__meters_p_sec;  /* Speed in the Y direction (m/s) */
+    
+    double z_range__meters;    /* Current height of the sensor from the ground in meters */
+    
+    double dt__sec;   /* Time elapsed (in seconds) since the last measurement - this is the duration it took for dx,dy to form */
+};
+
+
+/* Conversion constants */
+const double BITCRAZE_FOV_DEGREES = 42;
+const double DEGREES_PER_PI = 180;
+const double BITCRAZE_FOV_RADIANS = (BITCRAZE_FOV_DEGREES / DEGREES_PER_PI) * M_PI;
+const double MILIMETERS_PER_PIXEL = 30;
+
+
+/*=======================================================
+* @brief           Metric unit conversions
+=========================================================*/
+
+inline double MILIMETER_TO_METER(const double x_mm)
+{
+    return 10e-3 * x_mm;
+}
+
+inline double MILISECOND_TO_SECOND(const double x_ms)
+{
+    return 10e-3 * x_ms;
+}
+
+
+
+/*=======================================================
+* @brief           Convert Bitcraze data to metric units
+*
+* @param           bitcraze_input  -  Bitcraze odometer reading.
+*
+* @return          Odometer data in metric format.
+*
+* @author          Daniel Greenberger
+=========================================================*/
+inline const OdometerDataUnit convert_to_metric_units(const Flow& bitcraze_input)
+{
+    const double dx_pixels = static_cast<double>(bitcraze_input.deltaX);
+    const double dy_pixels = static_cast<double>(bitcraze_input.deltaY);
+    const double z_height_mm = static_cast<double>(bitcraze_input.range);
+    const double dt_ms = static_cast<double>(bitcraze_input.dt);
+
+    // Note: the formula is taken from the AutoRaceCar document (page 20)
+    const double dx_mm = z_height_mm * BITCRAZE_FOV_RADIANS * dx_pixels / (MILIMETERS_PER_PIXEL);
+    const double dy_mm = z_height_mm * BITCRAZE_FOV_RADIANS * dy_pixels / (MILIMETERS_PER_PIXEL);
+    
+    OdometerDataUnit metric_data;
+    
+    metric_data.dx__meters      = MILIMETER_TO_METER(dx_mm);
+    metric_data.dy__meters      = MILIMETER_TO_METER(dy_mm);
+    metric_data.z_range__meters = MILIMETER_TO_METER(z_height_mm);
+    metric_data.dt__sec         = MILISECOND_TO_SECOND(dt_ms);
+    metric_data.vx__meters_p_sec         = metric_data.dx__meters / metric_data.dt__sec;
+    metric_data.vy__meters_p_sec         = metric_data.dy__meters / metric_data.dt__sec;
+    
+    return metric_data;
+    
+}
+
+
+
+
+
+
+
 
 			
 					
