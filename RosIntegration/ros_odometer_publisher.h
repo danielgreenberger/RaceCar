@@ -196,7 +196,12 @@ public:
             /* Update */
             m_last_odom_snapshot.total_dist_x += odom_lab_data.dx__meters;
             m_last_odom_snapshot.total_dist_y += odom_lab_data.dy__meters;
+            
+            m_last_odom_snapshot.current_speed_x = odom_lab_data.vx__meters_p_sec;
+            m_last_odom_snapshot.current_speed_y = odom_lab_data.vy__meters_p_sec;
+            
             m_last_odom_snapshot.last_update_timestamp = curr_time;
+            m_last_odom_snapshot.current_z_range = odom_data.z_range__meters;
             m_last_odom_snapshot.total_rotation_z_axis += rotation_z_diff;
         )
         
@@ -234,7 +239,7 @@ private:
         
         
         /* Define publish frequency */
-        ros::Rate publisher_rate_per_second(100);
+        ros::Rate publisher_rate_per_second(10);
         
         
         /* Publish in loop */
@@ -248,11 +253,6 @@ private:
             OdometerData snapshot;
             ODOMETER_CRITICAL_SECTION
             (
-//                  snapshot.translation__x  = m_last_odom_snapshot.translation__x; 
-//                  snapshot.translation__y  = m_last_odom_snapshot.translation__y;
-//                  snapshot.rotation_z_axis = m_last_odom_snapshot.rotation_z_axis;
-//                  snapshot.curr_height_z   = m_last_odom_snapshot.curr_height_z;
-//                  snapshot.last_update_tsf = m_last_odom_snapshot.last_update_tsf;
                     snapshot = m_last_odom_snapshot;
             )
             
@@ -347,8 +347,8 @@ private:
         
         odom.header.stamp = snapshot.last_update_timestamp;
         
-        odom.header.frame_id = ODOMETER_FRAME_ID;
-        odom.child_frame_id = LAB_FRAME_ID;
+        odom.header.frame_id = LAB_FRAME_ID;
+        odom.child_frame_id = ODOMETER_FRAME_ID;
         
         odom.pose.pose.position.x = snapshot.total_dist_x;
         odom.pose.pose.position.y = snapshot.total_dist_y;
@@ -381,11 +381,11 @@ private:
 
         geometry_msgs::TransformStamped odom_trans;
         
-        ros::Time curr_time = m_last_odom_snapshot.last_update_timestamp;
+        ros::Time curr_time = snapshot.last_update_timestamp;
         odom_trans.header.stamp = curr_time;
         
-        odom_trans.header.frame_id = ODOMETER_FRAME_ID;
-        odom_trans.child_frame_id = LAB_FRAME_ID;
+        odom_trans.header.frame_id = LAB_FRAME_ID;
+        odom_trans.child_frame_id = ODOMETER_FRAME_ID;
         
         odom_trans.transform.translation.x = snapshot.total_dist_x;
         odom_trans.transform.translation.y = snapshot.total_dist_y;

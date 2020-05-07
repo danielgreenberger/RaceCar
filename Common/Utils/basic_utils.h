@@ -176,6 +176,22 @@ inline std::string MARK_UNDERSCORE(std::string text)
 
 
 
+
+
+
+
+
+
+
+#define DBG_PRINT(var)                                                                                  \
+do                                                                                                                    \
+{                                                                                                                     \
+    const char* var_string = #var;                                                                        \
+    std::cout<< var_string << ": " << var << std::endl;                    \
+}                                                                                                                     \
+while(0);                                                                                                             
+
+
 ////////////////////////////////////////////////
 /////          ASSERT & EXCEPTIONS         /////
 ////////////////////////////////////////////////

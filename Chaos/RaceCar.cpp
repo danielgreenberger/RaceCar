@@ -512,6 +512,8 @@ RaceCar &RaceCar::getBitCrazeOutput()
     _bitcraze.requestFlowData();
     while (_is_running) 
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        
         /* Get BitCraze data */
         const Flow flow_data = _bitcraze.getFlowOutput();
 
