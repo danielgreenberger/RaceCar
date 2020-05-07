@@ -92,6 +92,7 @@ struct OdometerData
     
     /* time */
     ros::Time last_update_timestamp;
+    
 };
 
 
@@ -120,6 +121,10 @@ private:
     
     /* Mutex */
     std::mutex m_odometer_mutex; // See comment at critical-section macro about the need of the mutex.
+    
+    
+    /* Info published */
+    bool m_no_data_received = true;
 
     
     
@@ -204,6 +209,8 @@ public:
             m_last_odom_snapshot.last_update_timestamp = curr_time;
             m_last_odom_snapshot.current_z_range = odom_data.z_range__meters;
             m_last_odom_snapshot.total_rotation_z_axis += rotation_z_diff;
+            
+            m_no_data_received = false; // Now we can start publishing
         )
         
     }
@@ -247,6 +254,13 @@ private:
         int count = 0;
         while ( this->active() )
         {
+            // Only publish if real data was received
+            if(_Rarely(m_no_data_received))
+            {
+                continue;
+            }
+            
+            
             // Publish  [Odometer => Base]  frame transformation 
             publish_static_TF_transforms();
             
@@ -254,7 +268,7 @@ private:
             OdometerData snapshot;
             ODOMETER_CRITICAL_SECTION
             (
-                    snapshot = m_last_odom_snapshot;
+                snapshot = m_last_odom_snapshot;
             )
             
             // Publish TF transforms
@@ -426,8 +440,6 @@ private:
 //              ASSERT(false, tf::TransformException("Received an exception trying to transform a point"));
 //         }
 //      }
-
-
 
 
 #undef ROS_PUBLISHER_CRITICAL_SECTION
