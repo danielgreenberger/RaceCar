@@ -7,6 +7,7 @@
 #include <memory>
 #include "ros_lib.h"
 #include <chrono>
+#include "odometer_calculations.h"
 
 #define SERVER_PORT 5556
 #define MAX_NUM_USERS 5
