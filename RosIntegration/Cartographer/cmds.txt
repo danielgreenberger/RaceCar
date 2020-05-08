@@ -67,13 +67,24 @@ run in the terminal:
 roslaunch realsense2_camera cartographer.launch
 '''
 
+** cartographer.launch ** is a modified launch file located at ''' /home/nvidia/catkin_ws_realsense_2020/src/realsense-ros/launch ''' and is based on demo_pointcloud.launch. 
+
+We chose to base on this specific launch file as it had the PointCloud option already included.
+
+The modifications performed to demo_pointcloud.launch:
+1. Add the IMU topic, as this ia required by the Cartographer for 3D mapping. 
+2. Perform [remapping](http://wiki.ros.org/roslaunch/XML/remap) of the PointCloud and IMU topics, so they will match with the topics the Cartographer listens to. 
+
+**Note:** The remmaping of topics can also be done at the Cartographer lua script. In such case, we would remap in the reverse direction (from the Cartograoher input names to the RealSense names). To see an example of such ramapping look at the other cartograoher launch files.  
+
+
 
 ## step 3 : Running the RaceCar node
 
 In **terminal 3**:
+
 '''
 rosrun racecar racecar
-'''
 '''
 
 
@@ -98,12 +109,14 @@ We have used the online running option, so our launch file was based on **my_rob
 **To collect the mapping results ** you can open rviz and subscribe to the map topic.
 
 
-### First running attempt: PointCloud2, no Odometerm
+### running attempt #1: PointCloud2, no Odometer
 
-The first mapping attempt was as follows:
+The first mapping is described below.
+We chose to first get a good mapping in 2D before trying the 3D mapping, 
+as 2D maps are somewhat easier to imterpret and verify.
 
 ** Depth image type: **  PointCloud, as supplied by the RealSense ROS node. 
-** Odometry used: ** No odometry data.
+** Odometry used: ** No odometry data (Bitcraze outputs garbage values.)
 ** Mapping type (2D/3D): ** 2D
 
 ** More info: ** 
@@ -119,6 +132,28 @@ TODO: insert rviz___first_run_attempt_pointcloud_2d_walking_the_lab2.png
 
 We can see that the initial results is not accurate at all. 
 However, looking the zoom-in image (second figure) was can see the corridor. 
+
+
+
+
+
+### running attempt #2: Laser data, no Odometer
+
+
+** Depth image type: **  
+** Odometry used: ** No odometry data (Bitcraze outputs garbage values).
+** Mapping type (2D/3D): ** 2D
+
+** More info: ** 
+
+
+** Results **
+
+
+
+
+
+
 
 
 
