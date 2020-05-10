@@ -10,16 +10,16 @@ First make sure you have sourced all the workspaces (one workspace needs to be s
 
 ### Cartographer  (terminal 1)
 
-'''
+```
 source /home/nvidia/catkin_ws_cartog_2020/install_isolated/setup.bash
-'''
+```
 
 Alternatively, if you want to source it by default you can add it to the bash environment (not recommended, since the default ws is currently the RealSense workspace):
 
-'''
+```
 echo "source /home/nvidia/catkin_ws_cartog_2020/install_isolated/setup.bash" >> ~/.bashrc
 source ~/.bashrc
-'''
+```
 
 
 **Note:** 
@@ -35,22 +35,22 @@ If they are not installed automatically, just install them using apt-get.
 
 ### RealSense  (terminal 2) 
 
-** This step is relevant only if you chose to use the official ReslSense ROS wrapper **
+**This step is relevant only if you chose to use the official ReslSense ROS wrapper**
 
 The Realsense library should be sourced by default. 
 If this is not the case:
 
-'''
+```
 echo "source /home/nvidia/catkin_ws_realsense_2020/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
-'''
+```
 
 
 ### RaceCar  (terminal 3) 
 
-'''
+```
 source /home/nvidia/daniel_greenberger/final/catkin_ws/devel/setup.bash
-'''
+```
 
 
 
@@ -59,15 +59,15 @@ source /home/nvidia/daniel_greenberger/final/catkin_ws/devel/setup.bash
 
 ## step 2 : Running the RealSense camera node
 
-** This step is relevant only if you chose to use the official ReslSense ROS wrapper **
+**This step is relevant only if you chose to use the official ReslSense ROS wrapper**
 
 run in the terminal:
 
-'''
+```
 roslaunch realsense2_camera cartographer.launch
-'''
+```
 
-** cartographer.launch ** is a modified launch file located at ''' /home/nvidia/catkin_ws_realsense_2020/src/realsense-ros/launch ''' and is based on demo_pointcloud.launch. 
+**cartographer.launch** is a modified launch file located at ``` /home/nvidia/catkin_ws_realsense_2020/src/realsense-ros/launch ``` and is based on demo_pointcloud.launch. 
 
 We chose to base on this specific launch file as it had the PointCloud option already included.
 
@@ -83,9 +83,9 @@ The modifications performed to demo_pointcloud.launch:
 
 In **terminal 3**:
 
-'''
+```
 rosrun racecar racecar
-'''
+```
 
 
 
@@ -94,9 +94,9 @@ rosrun racecar racecar
 
 To run the cartographer, simply run:
 
-'''
+```
 roslaunch cartographer_ros racecar.launch
-'''
+```
 
 **racecar.launch** is a launch file we created which runs the cartographer with specific configurations, 
 which are found in the **racecar_2d.lua**
@@ -106,7 +106,7 @@ To understand how to config the launch and lua files, please visit the [Cartogra
 We have used the online running option, so our launch file was based on **my_robot.launch**
 
 
-**To collect the mapping results ** you can open rviz and subscribe to the map topic.
+**To collect the mapping results** you can open rviz and subscribe to the map topic.
 
 
 ### running attempt #1: PointCloud2, no Odometer
@@ -115,17 +115,17 @@ The first mapping is described below.
 We chose to first get a good mapping in 2D before trying the 3D mapping, 
 as 2D maps are somewhat easier to imterpret and verify.
 
-** Depth image type: **  PointCloud, as supplied by the RealSense ROS node. 
-** Odometry used: ** No odometry data (Bitcraze outputs garbage values.)
-** Mapping type (2D/3D): ** 2D
+**Depth image type:**  PointCloud, as supplied by the RealSense ROS node. 
+**Odometry used:** No odometry data (Bitcraze outputs garbage values.)
+**Mapping type (2D/3D):** 2D
 
-** More info: ** 
+**More info:** 
 We walked the robot around the lab (carried by hand) in a path following around the walls. 
 The path included the main lab area as well as the small corridor, excluding the VISTA lab and other rooms such as the kitchen. 
 
 The robot was held parrallel to the ground in a height of ~1.5 meters.
 
-** Results **
+**Results**
 Looking at the output figures (collected using rviz):
 TODO: insert rviz___first_run_attempt_pointcloud_2d_walking_the_lab.png
 TODO: insert rviz___first_run_attempt_pointcloud_2d_walking_the_lab2.png
@@ -143,26 +143,26 @@ However, looking the zoom-in image (second figure) was can see the corridor.
 The conversion to Laser data was made using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) package.
 
 Install:
-'''
+```
 sudo apt-get install ros-melodic-depthimage-to-laserscan
-'''
+```
 
 Then, add it to the RealSense launch file:
-'''
+```
 	<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
   	<remap from="image" to="/camera/depth/image_raw"/>
 	</node>
-'''
+```
 
 
-** Depth image type: **  Laser scan, produced by depthimage_to_laserscan.
-** Odometry used: ** No odometry data (Bitcraze outputs garbage values).
-** Mapping type (2D/3D): ** 2D
+**Depth image type:**  Laser scan, produced by depthimage_to_laserscan.
+**Odometry used:** No odometry data (Bitcraze outputs garbage values).
+**Mapping type (2D/3D):** 2D
 
-** More info: ** 
+**More info:** 
 
 
-** Results **
+**Results**
 
 
 
