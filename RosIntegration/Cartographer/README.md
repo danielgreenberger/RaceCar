@@ -153,17 +153,20 @@ Install:
 sudo apt-get install ros-melodic-depthimage-to-laserscan
 ```
 
-Then, add it to the RealSense launch file:
+Then, add it to the end of the RealSense launch file:
 ```
 	<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
-  	<remap from="image" to="/camera/depth/image_raw"/>
+  	<remap from="image" to="/camera/depth/image_rect_raw"/>
 	</node>
 ```
 
 
 **Depth image type:**  Laser scan, produced by depthimage_to_laserscan.
+
 **Odometry used:** No odometry data (Bitcraze outputs garbage values).
+
 **Mapping type (2D/3D):** 2D
+
 
 **More info:** 
 
