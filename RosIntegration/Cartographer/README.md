@@ -130,16 +130,13 @@ The path included the main lab area as well as the small corridor, excluding the
 The robot was held parrallel to the ground in a height of ~1.5 meters.
 
 
-![running_attempt_1_a](rviz___first_run_attempt_pointcloud_2d_walking_the_lab.png)
-![running_attempt_1_b](rviz___first_run_attempt_pointcloud_2d_walking_the_lab2.png)
+![running_attempt_1_a](images/rviz___first_run_attempt_pointcloud_2d_walking_the_lab.png)
+![running_attempt_1_b](images/rviz___first_run_attempt_pointcloud_2d_walking_the_lab2.png)
 
 **Results**
 
-Looking at the output figures (collected using rviz):
-TODO: insert rviz___first_run_attempt_pointcloud_2d_walking_the_lab.png
-TODO: insert rviz___first_run_attempt_pointcloud_2d_walking_the_lab2.png
-
-We can see that the initial results is not accurate at all. 
+Looking at the output figures (collected using rviz),
+we can see that the initial results is not accurate at all. 
 However, looking the zoom-in image (second figure) was can see the corridor. 
 
 
