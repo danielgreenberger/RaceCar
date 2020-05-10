@@ -143,7 +143,7 @@ However, looking the zoom-in image (second figure) was can see the corridor.
 
 
 
-### running attempt #2: Laser data, no Odometer
+### Running attempt #2: Laser data, no Odometer, slow path around the main lab room
 
 
 The conversion to Laser data was made using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) package.
@@ -161,17 +161,24 @@ Then, add it to the end of the RealSense launch file:
 ```
 
 
-**Depth image type:**  Laser scan, produced by depthimage_to_laserscan.
+**Depth image type:**  Laser scan, produced by RealSense depth image and converted using depthimage_to_laserscan.
 
-**Odometry used:** No odometry data (Bitcraze outputs garbage values).
+**Odometry used:** No odometry data (Bitcraze outputs garbage values). This seems to be the major cause of failure, as will be described
 
 **Mapping type (2D/3D):** 2D
 
 
 **More info:** 
+The Robot was first put on a wheeled-rotating-chair and taken around the lab. 
+The reason for the chair was to make relatively-slow movement for the robot. 
+
 
 
 **Results**
+The laser scan seems to introduce less "noise", but the lack of odometry data has taken its toll. 
+It seems like although the Cartographer can produce good mapping for a "static point", it fails to sync images taken in different
+locations into coherent map. 
+ 
 
 
 
