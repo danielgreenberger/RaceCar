@@ -314,16 +314,21 @@ Then create the workspace folder:
 mkdir -p catkin_ws/src
 ```
 
-If you want to use this workspace with various node tools, you will need to source it:
-```
-source catkin_ws/devel/setup.bash 
-```
+
 
 ##### Step 2: Creating the racecar package
 The next step would be to create a package for racecar inside the workspace we just created.
 
+go to the src subfolder:
+
+```
+cd catkin_ws/src
+```
+
+and then create the racecar *package*:
+
 ``` 
-catkin_create_pkg racecar roscpp common_msgs tf 
+catkin_create_pkg racecar roscpp std_msgs tf 
 ```
 
 catkin_create_pkg is a convenience script for creating a new package.
@@ -333,7 +338,7 @@ packages racecar depends on for compilation/execution.
 
 **roscpp**       -  This is the ROS c++ API library.
 
-**common_msgs**  -  A package containing all standard ROS messages to be published to different topics
+**nav_msgs**     -  A package containing all standard ROS navigation messages. We need it for publishing IMU
 
 **tf**           -  A package responsible for keeping track of different coordinate systems.
 
@@ -341,7 +346,7 @@ packages racecar depends on for compilation/execution.
 
 ##### Step 3: makefile configuration
 
-Under catkin_ws/src/racecar you will find a CMakeLists.txt. 
+Under ```catkin_ws/src/racecar``` you will find a CMakeLists.txt. 
 
 Add the following lines under "build" section:
 
@@ -419,12 +424,12 @@ cmake is changed (i.e new file added/deleted).
 
 ##### Step 4: Copy all source files
 
-Copy all of racecar source files to catkin_ws/src/racecar/src
+Copy all of racecar source files to ```catkin_ws/src/racecar/src```
 
 ##### Step 5: Compile
 
 The next step would be to compile the workspace. 
-This is done by going to the workspace root firectory (catkin_ws in our example), 
+This is done by going to the workspace root firectory (```catkin_ws``` in our example), 
 and running 
 ``` 
 catkin_make 
@@ -435,10 +440,16 @@ This will build all the packages in the workspace.
 catkin_make has some other options such as building a specific package or forcing a re-build. 
 See documentation for more details. 
 
+
+Since we want to run nodes from this workspace , we will need to source it:
+```
+source catkin_ws/devel/setup.bash 
+```
+
 ##### Step 6: Running
 
 Last but not least, we would like to run the RaceCar node. 
-If you sourced the workspace, just run:
+Assuming you sourced the workspace, just run:
 
 ``` 
 rosrun racecar racecar 
