@@ -2,7 +2,7 @@
 
 Open 3 different terminals, which will be used for the **RaceCar**, **RealSense** and **Cartographer** nodes.
 
-## step 1: Sourcing the workspaces
+## Step 1: Sourcing the workspaces
 
 
 
@@ -57,7 +57,7 @@ source /home/nvidia/daniel_greenberger/final/catkin_ws/devel/setup.bash
 
 
 
-## step 2 : Running the RealSense camera node
+## Step 2 : Running the RealSense camera node
 
 **This step is relevant only if you chose to use the official ReslSense ROS wrapper**
 
@@ -79,7 +79,7 @@ The modifications performed to demo_pointcloud.launch:
 
 
 
-## step 3 : Running the RaceCar node
+## Step 3 : Running the RaceCar node
 
 In **terminal 3**:
 
@@ -89,7 +89,7 @@ rosrun racecar racecar
 
 
 
-## step 4 : Running the Google Cartographer
+## Step 4 : Running the Google Cartographer
 
 
 To run the cartographer, simply run:
@@ -109,23 +109,32 @@ We have used the online running option, so our launch file was based on **my_rob
 **To collect the mapping results** you can open rviz and subscribe to the map topic.
 
 
-### running attempt #1: PointCloud2, no Odometer
+### Running attempt #1: PointCloud2, no Odometer
 
 The first mapping is described below.
 We chose to first get a good mapping in 2D before trying the 3D mapping, 
 as 2D maps are somewhat easier to imterpret and verify.
 
 **Depth image type:**  PointCloud, as supplied by the RealSense ROS node. 
+
 **Odometry used:** No odometry data (Bitcraze outputs garbage values.)
+
 **Mapping type (2D/3D):** 2D
 
+
 **More info:** 
+
 We walked the robot around the lab (carried by hand) in a path following around the walls. 
 The path included the main lab area as well as the small corridor, excluding the VISTA lab and other rooms such as the kitchen. 
 
 The robot was held parrallel to the ground in a height of ~1.5 meters.
 
+
+![running_attempt_1_a](rviz___first_run_attempt_pointcloud_2d_walking_the_lab.png)
+![running_attempt_1_b](rviz___first_run_attempt_pointcloud_2d_walking_the_lab2.png)
+
 **Results**
+
 Looking at the output figures (collected using rviz):
 TODO: insert rviz___first_run_attempt_pointcloud_2d_walking_the_lab.png
 TODO: insert rviz___first_run_attempt_pointcloud_2d_walking_the_lab2.png
