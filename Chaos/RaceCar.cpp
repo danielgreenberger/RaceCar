@@ -510,12 +510,14 @@ RaceCar &RaceCar::getBitCrazeOutput()
 {
     std::cout << "enter BitCraze thread" << std::endl;
     _bitcraze.requestFlowData();
+    
     while (_is_running) 
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         
         /* Get BitCraze data */
         const Flow flow_data = _bitcraze.getFlowOutput();
+
 
         /* Update global odometer */
         std::lock_guard<std::mutex> lock(_flow_mtx);
@@ -525,7 +527,8 @@ RaceCar &RaceCar::getBitCrazeOutput()
         _flow_data.range = flow_data.range;
 //        _flow_data = flow_data;
 
-        /* ROS ONLY  -- Publish topic */
+
+        /* ROS ONLY  -- Publish Odometry data to ROS */
         ROS_CODE_SECTION
         (
             auto metric_odom_data = OdometerTransform::convert_to_metric_units(flow_data);

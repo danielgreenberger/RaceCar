@@ -271,7 +271,7 @@ private:
                 snapshot = m_last_odom_snapshot;
             )
             
-            // Publish TF transforms
+            // Publish TF transform
             const auto tf_transform = get_odom_to_lab_TF_transform(snapshot);
             m_p_TF_broadcaster->sendTransform(tf_transform);
             
