@@ -332,6 +332,8 @@ The Cartographer mapping was turned-on, and the chair was rotated in a slow moti
 
 
 **Results**
+
+
 The improvement in the constructed map is very noticeable.  
 
 ![rviz__attempt_3_revolving_chair_united_imu](images/rviz__attempt_3_revolving_chair_united_imu.png)
@@ -379,7 +381,7 @@ We can come up with 2 reasons as the root-cause:
 
 ### Summary
 
-The tune-in of the parameters proved to be very successfull for the construction of the map. 
+The tune-in of the parameters proved to be very successful for the construction of the map. 
 
 We need to have a reliable Odometer measurement if we want an accurate mapping, as once we have an Odometer we can freely drive the robot around the lab and map the entire room with high precision. 
 
