@@ -1,3 +1,72 @@
+# Introduction
+
+This deocument shows an example for using the RosIntegration of RaceCar for SLAM applications. 
+Specificaly, we show how to run the [Google cartographer](https://google-cartographer.readthedocs.io/en/latest/) and how to tune 
+RaceCar's sensing devices to the inputs required by the Cartographer. 
+
+The [first section](Cartographer-input) will provide a short overview of the input expected by the Cartographer, as well as the available output from the sensing devices of RaceCar 
+
+The [second section](TODO insert link) is a practical guide for running the Cartographer under RaceCar.
+If you are new to ROS, it is also recommended to read the [RosIntegration documentation] to get up-to-speed with ROS basic functionality and RaceCar wrapper APIs.
+
+The [third and last](TODO insert link) section describes the iterative process of tuning the input from RaceCar sensing devices in order to construct a coherent map using Cartographer. 
+
+
+
+# Cartographer input and sensing output.
+## Cartographer input
+
+A comprehensive guide on the required input can be found [here](https://google-cartographer-ros.readthedocs.io/en/latest/ros_api.html), under **Subscribed Topics**. 
+
+The Cartographer can perform 2D or 3D mapping. 
+This document focuses on 2D mapping as the output is easier to verify against a ground-truth.
+However, this guide can be easily used for 3D mapping with minor modification, involving a small parameter change. 
+
+### Range data
+The Cartographer requires some range data as an input, such as PointCloud or Laser scan. Exactly one kind of range data can be supplied. 
+
+
+### IMU (gyroscope and linear acceleration)
+
+The cartographer may be supplied with IMU data, although it's optional for 2D mapping.
+Nevertheless, we found out that IMU is needed for constructing a good map, especially gyroscope (for keeping track of the robot orientation during the SLAM process).
+
+
+### Odometer
+The Cartographer can also be provided with odometer data, which is the distance travelled from a fixed point.
+Odometer data is not *required* by the cartographer, but similarly to IMU - it is highly needed for a good mapping.
+ 
+
+The sensing devices used by the Cartographer:
+
+### Intel RealSense depth Camera D435i
+	
+	This is a camera able to provide depth-image as well as IMU data (gyroscope and linear acceleration). 
+	The depth-image can be used to produce PointCloud (using the RealSense API) or Laser scan (using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) ROS package).
+	
+
+### Bitcraze Flow Breakout
+
+	This device can be used to provide Odometry data.
+	The output of the device includes the distance travelled in the X-Y direction as well as the distance from the floor. 
+	The Bitcraze output needs to be sampled constantly and converted to the X-Y distance in meters. 
+	Then, the new orientation of the robot needs to be determined, and the distance will need to be converted 
+	to the lab fixed frame. 
+	
+	For more information on how to process the output, you can view the RaceCar implementation at [odometer_calculations.h](https://github.com/danielgreenberger/RaceCar/blob/master/Common/Coordinates/odometer_calculations.h) and [racecar_coordinates.h](https://github.com/danielgreenberger/RaceCar/blob/master/Common/Coordinates/racecar_coordinates.h)
+	
+	**Note**: As of writing this document, we couldn't get a reliable reading from the bitcraze device. However, we developed and tested the entire software infrastructure for processing and publishing Odometer data, based on an accurate Bitcraze reading. More info can be found at the files mentioned above. 
+	As for the implementation, we tried avoiding using ROS-specific tools to make it portable to other platforms. 
+	
+	
+	
+	
+
+
+# Getting started
+
+This section will describe how to run Google Cartographer under the Racecar environment using ROS. 
+
 
 
 Open 3 different terminals, which will be used for the **RaceCar**, **RealSense** and **Cartographer** nodes.
@@ -109,7 +178,10 @@ We have used the online running option, so our launch file was based on **my_rob
 **To collect the mapping results** you can open rviz and subscribe to the map topic.
 
 
-### Running attempt #1: PointCloud2, no Odometer
+
+# Algorithm tune-in
+
+## Running attempt #1: PointCloud2, no Odometer
 
 The first mapping is described below.
 We chose to first get a good mapping in 2D before trying the 3D mapping, 
@@ -143,7 +215,7 @@ However, looking the zoom-in image (second figure) we may be able to see the cor
 
 
 
-### Running attempt #2: Laser data, no Odometer, static positioning of the robot
+## Running attempt #2: Laser data, no Odometer, static positioning of the robot
 
 
 The conversion to Laser data was made using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) package.
@@ -197,5 +269,66 @@ Looking at the results, we can deduce the following:
 2. In cases where an Odometer is not relevant (i.e the robot is at the same position), we see that the Cartographer still has a problem with "unwrapping" the Laser/PointCloud data and constructing the map. This can be noticeable from the deformation od the walls, as well as the blurred-image of the recycling bin. 
 
     
+
+
+
+
+## Running attempt #3: Laser data, no Odometer, slow path around the main lab room
+
+
+The conversion to Laser data was made using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) package.
+
+Install:
+```
+sudo apt-get install ros-melodic-depthimage-to-laserscan
+```
+
+Then, add it to the end of the RealSense launch file:
+```
+	<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
+  	<remap from="image" to="/camera/depth/image_rect_raw"/>
+	</node>
+```
+
+
+**Depth image type:**  Laser scan, produced by RealSense depth image and converted using depthimage_to_laserscan.
+
+**Odometry used:** No odometry data (Bitcraze outputs garbage values). This seems to be the major cause of failure, as will be described
+
+**Mapping type (2D/3D):** 2D
+
+
+**More info:** 
+The Robot was first put on a wheeled-rotating-chair and taken around the lab. 
+The reason for the chair was to make relatively-slow movement for the robot. 
+
+
+
+**Results**
+The laser scan seems to introduce less "noise", but the lack of odometry data is still taking its toll. 
+It seems like although the Cartographer can produce good mapping for a "static point", it fails to sync images taken in different
+locations into a coherent map. 
+
+
+### Running attempt #4: Trying to fine-tune the algorithm min/max range
+TRAJECTORY_BUILDER_nD.min_range
+TRAJECTORY_BUILDER_nD.max_range
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
