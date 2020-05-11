@@ -347,6 +347,19 @@ Looking at the results, we can say a few things:
 2. We can see that the Cartographer recognized the right wall as longer - this is due to the recycling bin positioned on the right.
 
 
+
+### Lab mapping
+
+We can also notice a less-accurate mapping of the lab main room. 
+
+The Cartographer correctly detected the central space as "empty", although with less certainty, and the general rectangular layout of the tables. 
+
+This is still not accurate enough, mainly because the robot stayed closer to the corridor entrance. 
+
+It might have been more accurate if the robot was rotated for a few more minutes, 
+allowing the cartographer to get a better certainty of the surroundings. 
+
+
 ### Mapping mistakes
 
 The Cartographer incorrecly assumed that the robot has moved, as can be noticed by the blue marking on the map (it interpreted the chair-rotation as linear movement).  
@@ -362,6 +375,13 @@ We can come up with 2 reasons as the root-cause:
 
 2. The detection error of the robot current position - most likely
 
+
+
+### Summary
+
+The tune-in of the parameters proved to be very successfull for the construction of the map. 
+
+We need to have a reliable Odometer measurement if we want an accurate mapping, as once we have an Odometer we can freely drive the robot around the lab and map the entire room with high precision. 
 
 
 
