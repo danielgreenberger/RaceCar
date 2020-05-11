@@ -1,0 +1,43 @@
+<launch>
+  <remap from="/camera/depth/color/points" to="/points2"/>
+  <remap from="/camera/accel/sample" to="/imu"/>
+  <remap from="/camera/gyro/sample" to="/imu"/>
+  <remap from="/camera/imu" to="/imu"/>
+  <arg name="serial_no"             default=""/>
+  <arg name="json_file_path"        default=""/>
+  <arg name="camera"                default="camera"/>
+  
+  <group ns="$(arg camera)">
+    <include file="$(find realsense2_camera)/launch/includes/nodelet.launch.xml">
+      <arg name="serial_no"         value="$(arg serial_no)"/>
+      <arg name="json_file_path"    value="$(arg json_file_path)"/>
+      <arg name="depth_width"       value="640"/>
+      <arg name="depth_height"      value="480"/>
+      <arg name="depth_fps"         value="30"/>
+      <arg name="color_width"       value="640"/>
+      <arg name="color_height"      value="480"/>
+      <arg name="color_fps"         value="30"/>
+      <arg name="enable_depth"      value="true"/>
+      <arg name="enable_color"      value="true"/>
+      <arg name="enable_infra1"     value="false"/>
+      <arg name="enable_infra2"     value="false"/>
+      <arg name="enable_fisheye"    value="false"/>
+      <arg name="enable_gyro"       default="true"/>
+      <arg name="enable_accel"      default="true"/>
+      <arg name="gyro_fps"          default="400"/>
+      <arg name="accel_fps"         default="250"/>
+      <arg name="enable_pointcloud" value="true"/>
+      <arg name="enable_sync"       value="false"/>
+      <arg name="tf_prefix"         value="$(arg camera)"/>
+        <arg name="align_depth" value="true"/>
+        <arg name="linear_accel_cov" value="1.0"/>
+        <arg name="unite_imu_method" value="linear_interpolation"/>
+    </include>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find realsense2_camera)/rviz/pointcloud.rviz" required="true" />
+  </group>
+
+  <node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
+     <remap from="image" to="/camera/depth/image_rect_raw"/>
+  </node>
+</launch>

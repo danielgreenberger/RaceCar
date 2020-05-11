@@ -9,7 +9,7 @@ The [first section](#Cartographer-input-and-sensing-output) will provide a short
 The [second section](#Getting-started) is a practical guide for running the Cartographer under RaceCar.
 If you are new to ROS, it is also recommended to read the [RosIntegration documentation] to get up-to-speed with ROS basic functionality and RaceCar wrapper APIs.
 
-The [third and last](#Algorithm-running-and-input-tune-in) section describes the iterative process of tuning the input from RaceCar sensing devices in order to construct a coherent map using Cartographer. 
+The [third and last](#Algorithm-running-and-input-tune-in) section describes the iterative process of tuning the input from RaceCar sensing devices in order to construct a coherent map using Cartographer. It is somewhat verbose, but you can skip to the last running attempt to see the best result. 
 
 
 
@@ -34,8 +34,9 @@ Nevertheless, we found out that IMU is needed for constructing a good map, espec
 
 ### Odometer
 The Cartographer can also be provided with odometer data, which is the distance travelled from a fixed point.
-Odometer data is not *required* by the cartographer, but similarly to IMU - it is highly needed for a good mapping.
+Odometer data is not *required* by the cartographer, but similarly to IMU - it is highly needed for creating a good mapping.
  
+
 
 The sensing devices used by the Cartographer:
 
@@ -61,7 +62,7 @@ For more information on how to process the output, you can view the RaceCar impl
 **Note**: 
 As of writing this document, we couldn't get a reliable reading from the bitcraze device. 
 
-However, we developed and tested the entire software infrastructure for processing and publishing Odometer data, based on an accurate Bitcraze reading. 
+However, we developed and tested the entire software infrastructure for processing and publishing Odometer data, which can be used with an accurate Bitcraze reading. 
 
 More info can be found at the files mentioned above. 
 
@@ -275,6 +276,7 @@ On the right-hand-side of the map, we can see a blurred-image of the recycling b
 Looking at the results, we can deduce the following:
 
 1. Although optional, an accurate Odometer is an important part of the SLAM process and should be supplied to the Cartograoher. 
+
 2. In cases where an Odometer is not relevant (i.e the robot is at the same position), we see that the Cartographer still has a problem with "unwrapping" the Laser/PointCloud data and constructing the map. This can be noticeable from the deformation od the walls, as well as the blurred-image of the recycling bin. 
 
     
@@ -282,27 +284,22 @@ Looking at the results, we can deduce the following:
 
 
 
-## Running attempt #3: Laser data, no Odometer, slow path around the main lab room
+## Running attempt #3: Laser data, no Odometer, tuning the RealSense sensors data
 
 
-The conversion to Laser data was made using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) package.
+This experiment in similar conditions of the previous one, but we made some changes to the RealSense sensors data which significantly improved the results. 
 
-Install:
-```
-sudo apt-get install ros-melodic-depthimage-to-laserscan
-```
 
-Then, add it to the end of the RealSense launch file:
-```
-	<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
-  	<remap from="image" to="/camera/depth/image_rect_raw"/>
-	</node>
-```
+The changes we made:
+
+1. Making sure that IMU data arrives at the max frequency possible (400 fps for gyro, 250 fps for acceleration)
+
+2. 
 
 
 **Depth image type:**  Laser scan, produced by RealSense depth image and converted using depthimage_to_laserscan.
 
-**Odometry used:** No odometry data (Bitcraze outputs garbage values). This seems to be the major cause of failure, as will be described
+**Odometry used:** No odometry data (Bitcraze outputs garbage values). 
 
 **Mapping type (2D/3D):** 2D
 
