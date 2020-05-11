@@ -4,7 +4,7 @@ This deocument shows an example for using the RosIntegration of RaceCar for SLAM
 Specificaly, we show how to run the [Google cartographer](https://google-cartographer.readthedocs.io/en/latest/) and how to tune 
 RaceCar's sensing devices to the inputs required by the Cartographer. 
 
-The [first section](Cartographer-input) will provide a short overview of the input expected by the Cartographer, as well as the available output from the sensing devices of RaceCar 
+The [first section](#Cartographer-input) will provide a short overview of the input expected by the Cartographer, as well as the available output from the sensing devices of RaceCar 
 
 The [second section](TODO insert link) is a practical guide for running the Cartographer under RaceCar.
 If you are new to ROS, it is also recommended to read the [RosIntegration documentation] to get up-to-speed with ROS basic functionality and RaceCar wrapper APIs.
@@ -41,24 +41,24 @@ The sensing devices used by the Cartographer:
 
 ### Intel RealSense depth Camera D435i
 	
-	This is a camera able to provide depth-image as well as IMU data (gyroscope and linear acceleration). 
-	The depth-image can be used to produce PointCloud (using the RealSense API) or Laser scan (using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) ROS package).
-	
+This is a camera able to provide depth-image as well as IMU data (gyroscope and linear acceleration). 
+The depth-image can be used to produce PointCloud (using the RealSense API) or Laser scan (using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) ROS package).
+
 
 ### Bitcraze Flow Breakout
 
-	This device can be used to provide Odometry data.
-	The output of the device includes the distance travelled in the X-Y direction as well as the distance from the floor. 
-	The Bitcraze output needs to be sampled constantly and converted to the X-Y distance in meters. 
-	Then, the new orientation of the robot needs to be determined, and the distance will need to be converted 
-	to the lab fixed frame. 
-	
-	For more information on how to process the output, you can view the RaceCar implementation at [odometer_calculations.h](https://github.com/danielgreenberger/RaceCar/blob/master/Common/Coordinates/odometer_calculations.h) and [racecar_coordinates.h](https://github.com/danielgreenberger/RaceCar/blob/master/Common/Coordinates/racecar_coordinates.h)
-	
-	**Note**: As of writing this document, we couldn't get a reliable reading from the bitcraze device. However, we developed and tested the entire software infrastructure for processing and publishing Odometer data, based on an accurate Bitcraze reading. More info can be found at the files mentioned above. 
-	As for the implementation, we tried avoiding using ROS-specific tools to make it portable to other platforms. 
-	
-	
+This device can be used to provide Odometry data.
+The output of the device includes the distance travelled in the X-Y direction as well as the distance from the floor. 
+The Bitcraze output needs to be sampled constantly and converted to the X-Y distance in meters. 
+Then, the new orientation of the robot needs to be determined, and the distance will need to be converted 
+to the lab fixed frame. 
+
+For more information on how to process the output, you can view the RaceCar implementation at [odometer_calculations.h](https://github.com/danielgreenberger/RaceCar/blob/master/Common/Coordinates/odometer_calculations.h) and [racecar_coordinates.h](https://github.com/danielgreenberger/RaceCar/blob/master/Common/Coordinates/racecar_coordinates.h)
+
+**Note**: As of writing this document, we couldn't get a reliable reading from the bitcraze device. However, we developed and tested the entire software infrastructure for processing and publishing Odometer data, based on an accurate Bitcraze reading. More info can be found at the files mentioned above. 
+As for the implementation, we tried avoiding using ROS-specific tools to make it portable to other platforms. 
+
+
 	
 	
 
