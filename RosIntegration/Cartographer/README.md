@@ -23,7 +23,7 @@ source ~/.bashrc
 
 
 **Note:** 
-If you haven't yet installed google-cartographer, see the [offical guide](https://google-cartographer-ros.readthedocs.io/en/latest/compilation.html#building-installation) for more details. 
+If you haven't yet installed google-cartographer, see the [official guide](https://google-cartographer-ros.readthedocs.io/en/latest/compilation.html#building-installation) for more details. 
 We recommend not using the ninja build as it may compicate the compilation process under the Jetson linux kernel. 
 During the installation we found some packages to be missing:
 - glog (Google log)
@@ -137,13 +137,71 @@ The robot was held parrallel to the ground in a height of ~1.5 meters.
 
 Looking at the output figures (collected using rviz),
 we can see that the initial results is not accurate at all. 
-However, looking the zoom-in image (second figure) was can see the corridor. 
+However, looking the zoom-in image (second figure) we may be able to see the corridor. 
 
 
 
 
 
-### Running attempt #2: Laser data, no Odometer, slow path around the main lab room
+### Running attempt #2: Laser data, no Odometer, static positioning of the robot
+
+
+The conversion to Laser data was made using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) package.
+
+Install:
+```
+sudo apt-get install ros-melodic-depthimage-to-laserscan
+```
+
+Then, add it to the end of the RealSense launch file:
+```
+	<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
+  	<remap from="image" to="/camera/depth/image_rect_raw"/>
+	</node>
+```
+
+
+**Depth image type:**  Laser scan, produced by RealSense depth image and converted using depthimage_to_laserscan.
+
+**Odometry used:** 
+
+No odometry data (Bitcraze outputs garbage values). 
+
+This seems to be the major cause of failure, as will be described.
+
+
+
+**Mapping type (2D/3D):** 2D
+
+
+**More info:** 
+
+In order to neglect the (lack of) odometer - in this experiment we mounted the robot on a rotating chair at
+the entrance to the corridor. 
+The robot was moved slightly by making small rotations of the chair. 
+The position of the robot as well as the chair are presented below
+
+
+**Results**
+
+![running_attempt_2_a](images/rviz__second_attempt_corridor_vs_map.jpg)
+
+
+As we can see, using static positioning, we can see how the Cartographer uses the Laser data to construct a map of the corridor. 
+
+On the right-hand-side of the map, we can see a blurred-image of the recycling bin.
+
+Looking at the results, we can deduce the following:
+
+1. Although optional, an accurate Odometer is an important part of the SLAM process and should be supplied to the Cartograoher. 
+2. In cases where an Odometer is not relevant (i.e the robot is at the same position), we see that the Cartographer still has a problem with "unwrapping" the Laser/PointCloud data and constructing the map. This can be noticeable from the deformation od the walls, as well as the blurred-image of the recycling bin. 
+
+    
+
+
+
+
+### Running attempt #3: Laser data, no Odometer, slow path around the main lab room
 
 
 The conversion to Laser data was made using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) package.
@@ -175,9 +233,11 @@ The reason for the chair was to make relatively-slow movement for the robot.
 
 
 **Results**
-The laser scan seems to introduce less "noise", but the lack of odometry data has taken its toll. 
+The laser scan seems to introduce less "noise", but the lack of odometry data is still taking its toll. 
 It seems like although the Cartographer can produce good mapping for a "static point", it fails to sync images taken in different
-locations into coherent map. 
+locations into a coherent map. 
+
+
  
 
 
