@@ -290,36 +290,50 @@ Looking at the results, we can deduce the following:
 This experiment in similar conditions of the previous one, but we made some changes to the RealSense sensors data which significantly improved the results. 
 
 
+The updated RealSense launch file containging the changes can be found [here](https://github.com/danielgreenberger/RaceCar/blob/master/RosIntegration/Cartographer/Launch/RealSense/cartographer.launch).
+
+
+
+
 The changes we made:
 
 1. Making sure that IMU data arrives at the max frequency possible (400 fps for gyro, 250 fps for acceleration)
 
-2. 
+2. Disable frame sync - This option gathers closest frames of different sensors, infra red, color and depth, to be sent with the same timetag. We wanted the timestamp to be as accurate as possible and threfore disabled this option. 
+
+3. We united the 2 IMU streams (accel and gyro) into 1 unifies stream. The streams were united using linear_interpolation. More info can be found [here](https://github.com/IntelRealSense/realsense-ros) (under **unite_imu_method**). 
+
+
+The last change seems to have the most effect, as unlike previous attempts, the Cartographer was able to use the Gyro data to detect the rotation of the robot and therefore rotate the constructed map according to the robot current orientation. 
+
 
 
 **Depth image type:**  Laser scan, produced by RealSense depth image and converted using depthimage_to_laserscan.
 
-**Odometry used:** No odometry data (Bitcraze outputs garbage values). 
+**Odometry used:** No odometry data . 
 
 **Mapping type (2D/3D):** 2D
 
 
 **More info:** 
-The Robot was first put on a wheeled-rotating-chair and taken around the lab. 
-The reason for the chair was to make relatively-slow movement for the robot. 
+
+The Odometer data is still missing in this experiment, and therefore we again wanted to minimize the need for it by sampling the environment from a fixed-point. 
+
+The Robot was put on a wheeled-rotating-chair and which was positioned at a fixed point, at the entrance to the corridor. 
+
+![running_attempt_3_robot_positioning](images/running_attempt_3_robot_positioning.jpg)
+
+The Cartographer mapping was turned-on, and the chair was rotated in a slow motion for several minutes. 
+
+
 
 
 
 **Results**
-The laser scan seems to introduce less "noise", but the lack of odometry data is still taking its toll. 
-It seems like although the Cartographer can produce good mapping for a "static point", it fails to sync images taken in different
-locations into a coherent map. 
+The improvement is 
 
-
-### Running attempt #4: Trying to fine-tune the algorithm min/max range
-TRAJECTORY_BUILDER_nD.min_range
-TRAJECTORY_BUILDER_nD.max_range
-
+![rviz__attempt_3_revolving_chair_united_imu](images/rviz__attempt_3_revolving_chair_united_imu.png)
+![rviz__attempt_3_revolving_chair_united_imu_enlarged](images/rviz__attempt_3_revolving_chair_united_imu_enlarged.png)
 
 
 
