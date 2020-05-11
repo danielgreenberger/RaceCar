@@ -7,7 +7,7 @@ RaceCar's sensing devices to the inputs required by the Cartographer.
 The [first section](#Cartographer-input-and-sensing-output) will provide a short overview of the input expected by the Cartographer, as well as the available output from the sensing devices of RaceCar 
 
 The [second section](#Getting-started) is a practical guide for running the Cartographer under RaceCar.
-If you are new to ROS, it is also recommended to read the [RosIntegration documentation] to get up-to-speed with ROS basic functionality and RaceCar wrapper APIs.
+If you are new to ROS, it is also recommended to read the [RosIntegration documentation](https://github.com/danielgreenberger/RaceCar/tree/master/RosIntegration/) to get up-to-speed with ROS basic functionality and RaceCar wrapper APIs.
 
 The [third and last](#Algorithm-running-and-input-tune-in) section describes the iterative process of tuning the input from RaceCar sensing devices in order to construct a coherent map using Cartographer. It is somewhat verbose, but you can skip to the last running attempt to see the best result. 
 
