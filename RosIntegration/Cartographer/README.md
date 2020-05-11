@@ -191,6 +191,8 @@ We have used the online running option, so our launch file was based on **my_rob
 
 # Algorithm running and input tune-in
 
+Note: This section is a bit verbose. You can skip to the [last running attempt](#running-attempt-3-laser-data-no-odometer-tuning-the-realsense-sensors-data) for the best results.
+
 ## Running attempt #1: PointCloud2, no Odometer
 
 The first mapping is described below.
@@ -330,10 +332,12 @@ The Cartographer mapping was turned-on, and the chair was rotated in a slow moti
 
 
 **Results**
-The improvement is 
+The improvement in the constructed map is very noticeable.  
 
 ![rviz__attempt_3_revolving_chair_united_imu](images/rviz__attempt_3_revolving_chair_united_imu.png)
 ![rviz__attempt_3_revolving_chair_united_imu_enlarged](images/rviz__attempt_3_revolving_chair_united_imu_enlarged.png)
+
+
 
 
 
