@@ -338,9 +338,29 @@ The improvement in the constructed map is very noticeable.
 ![rviz__attempt_3_revolving_chair_united_imu_enlarged](images/rviz__attempt_3_revolving_chair_united_imu_enlarged.png)
 
 
+Looking at the results, we can say a few things:
+
+### Corridor mapping
+
+1. We can clearly see the corridor and its bounding walls. The Cartographer has correctly marked the area of the corridor as "empty" (white) for the first few meters (each "box" is a meter). 
+
+2. We can see that the Cartographer recognized the right wall as longer - this is due to the recycling bin positioned on the right.
+
+
+### Mapping mistakes
+
+The Cartographer incorrecly assumed that the robot has moved, as can be noticed by the blue marking on the map (it interpreted the chair-rotation as linear movement).  
+
+Such mistakes can likely be solved by providing a reliable IMU.
 
 
 
+The rest of the corridor was incorrectly marked as an obstacle. 
+We can come up with 2 reasons as the root-cause:
+
+1. The rest of the corridor is beyond the reliable range of the camera from the fixed point of the robot - unlikely as the declared depth-range of the RealSense device is ~10 meters. 
+
+2. The detection error of the robot current position - most likely
 
 
 
