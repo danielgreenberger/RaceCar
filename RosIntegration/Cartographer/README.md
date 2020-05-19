@@ -229,15 +229,15 @@ In Offline mode, we first collect the data by recording a [ros bag file](http://
 The following command will begin recording sensor data into a file named **sensor_data.bag** which will be saved in the current directory. 
 
 
-'''
+```
 rosbag record --duration=30 --output-name=sensor_data  /tf /tf_static /imu/data /camera/depth/color/points
-'''
+```
 
 
 After the data is recorded, the Cartographer can be used to construct the map and trajectory based on the recorded data:
-'''
+```
 roslaunch cartographer_ros offline_racecar_2d.launch bag_filenames:=${PWD}/sensor_data.bag
-'''
+```
 
 
 
