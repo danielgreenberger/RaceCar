@@ -18,7 +18,7 @@
   <node name="cartographer_node" pkg="cartographer_ros"
       type="cartographer_node" args="
           -configuration_directory $(find cartographer_ros)/configuration_files
-          -configuration_basename racecar_2d_pointcloud.lua"
+          -configuration_basename racecar_2d_laser.lua"
       output="screen">
       <param name="use_sim_time" value="true"/>
       <remap from="/imu" to="/imu/data" />

@@ -8,7 +8,11 @@
         <remap from="/imu/data_raw" to="/camera/imu"/>
     </node>
   
-
+	<node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" > 
+  	<remap from="image" to="/camera/depth/image_rect_raw"/>
+	<param name="fixed_frame"  type="string" value="camera_gyro_frame" />
+        <param name="scan_height"  type="int" value="1" />
+	</node>
 
   <arg name="serial_no"             default=""/>
   <arg name="json_file_path"        default=""/>

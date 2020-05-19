@@ -9,7 +9,6 @@ Panels:
         - /TF1/Frames1
         - /Submaps1
         - /PointCloud21
-        - /MarkerArray3
       Splitter Ratio: 0.6006709933280945
     Tree Height: 781
   - Class: rviz/Selection
@@ -120,7 +119,22 @@ Visualization Manager:
       Submaps:
         All: true
         Trajectory 0:
-          0.20: true
+          0.180: true
+          1.180: true
+          10.180: true
+          11.180: true
+          12.180: true
+          13.180: true
+          14.147: true
+          15.57: true
+          2.180: true
+          3.180: true
+          4.180: true
+          5.180: true
+          6.180: true
+          7.180: true
+          8.180: true
+          9.180: true
           Value: true
       Topic: /submap_list
       Tracking frame: camera_link
@@ -210,15 +224,6 @@ Visualization Manager:
       Topic: /initialpose
       Unreliable: false
       Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: /constraint_list
-      Name: MarkerArray
-      Namespaces:
-        Intra constraints: true
-        Intra residuals: true
-      Queue Size: 100
-      Value: true
   Enabled: true
   Global Options:
     Background Color: 100; 100; 100
@@ -246,7 +251,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -0.9800022840499878
+      Angle: -1.4950021505355835
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -256,7 +261,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 39.03986740112305
+      Scale: 26.15053939819336
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
       X: 0
