@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /TF1
+        - /TF1/Frames1
         - /Submaps1
         - /PointCloud21
         - /MarkerArray3
@@ -59,27 +60,27 @@ Visualization Manager:
       Enabled: true
       Frame Timeout: 15
       Frames:
-        All Enabled: true
+        All Enabled: false
         camera_accel_frame:
-          Value: true
+          Value: false
         camera_accel_optical_frame:
-          Value: true
+          Value: false
         camera_aligned_depth_to_color_frame:
-          Value: true
+          Value: false
         camera_color_frame:
-          Value: true
+          Value: false
         camera_color_optical_frame:
-          Value: true
+          Value: false
         camera_depth_frame:
-          Value: true
+          Value: false
         camera_depth_optical_frame:
-          Value: true
+          Value: false
         camera_gyro_frame:
           Value: true
         camera_imu_optical_frame:
-          Value: true
+          Value: false
         camera_link:
-          Value: true
+          Value: false
         map:
           Value: true
         odom:
@@ -119,7 +120,7 @@ Visualization Manager:
       Submaps:
         All: true
         Trajectory 0:
-          0.4: true
+          0.20: true
           Value: true
       Topic: /submap_list
       Tracking frame: camera_link
@@ -255,7 +256,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 1341.0279541015625
+      Scale: 39.03986740112305
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
       X: 0

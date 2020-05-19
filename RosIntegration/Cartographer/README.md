@@ -154,7 +154,7 @@ The modifications performed to demo_pointcloud.launch:
 1. Add the IMU topic, as this ia required by the Cartographer for 3D mapping. 
 2. Perform [remapping](http://wiki.ros.org/roslaunch/XML/remap) of the PointCloud and IMU topics, so they will match with the topics the Cartographer listens to. 
 
-**Note:** The remmaping of topics can also be done at the Cartographer lua script. In such case, we would remap in the reverse direction (from the Cartograoher input names to the RealSense names). To see an example of such ramapping look at the other cartograoher launch files.  
+**Note:** The remmaping of topics can also be done at the Cartographer lua script. In such case, we would remap in the reverse direction (from the Cartographer input names to the RealSense names). To see an example of such ramapping look at the other cartograoher launch files.  
 
 
 
@@ -171,21 +171,80 @@ rosrun racecar racecar
 ## Step 4 : Running the Google Cartographer
 
 
-To run the cartographer, simply run:
+There are many options for running the Cartographer:
+#### **Online / Offline** 
+Online  -   map and location is generated based on sensor data which is supplied in real-time
 
-```
-roslaunch cartographer_ros racecar.launch
-```
+Offline  -  map and location is generated based on a rosbag recording which is played by the cartographer. 
 
-**racecar.launch** is a launch file we created which runs the cartographer with specific configurations, 
-which are found in the **racecar_2d.lua**
+#### **2D / 2D** 
+
+The Cartographer can create 3D or 2D mapping. 
+We have focused on 2D mapping since we saw it as a good starting point for checking the generated map and trajectory against 
+a physical ground truth.
+
+#### Other tuning options
+
+There are many other options to [tune the algorithm](https://google-cartographer-ros.readthedocs.io/en/latest/tuning.html) to your specific needs. 
+
+Some tuning options include:
+TODO
+
+
+
+Each options has it's own launch file and possibly a different lua configuration file (i.e 3D vs. 2D SLAM). 
 
 To understand how to config the launch and lua files, please visit the [Cartographer documentation](https://google-cartographer-ros.readthedocs.io/en/latest/your_bag.html).
+
+Below are some options we have tried and tested. 
+
+
+
+
+### Online SLAM - 2D
+```
+roslaunch cartographer_ros online_racecar_2d.launch
+```
+
+If you want to see the results in rviz, the following launch file will also open rviz with the relevant configurations:
+```
+roslaunch cartographer_ros online_racecar_2d_with_rviz.launch
+```
+
+The above launch files use the racecar_2d_pointcloud.lua file, which can be found [here](TODO-place link)
+
+
 
 We have used the online running option, so our launch file was based on **my_robot.launch**
 
 
 **To collect the mapping results** you can open rviz and subscribe to the map topic.
+
+
+
+### Offline SLAM - 2D
+
+In Offline mode, we first collect the data by recording a [ros bag file](http://wiki.ros.org/rosbag/Tutorials/Recording%20and%20playing%20back%20data).
+
+The following command will begin recording sensor data into a file named **sensor_data.bag** which will be saved in the current directory. 
+
+
+'''
+rosbag record --duration=30 --output-name=sensor_data  /tf /tf_static /imu/data /camera/depth/color/points
+'''
+
+
+After the data is recorded, the Cartographer can be used to construct the map and trajectory based on the recorded data:
+'''
+roslaunch cartographer_ros offline_racecar_2d.launch bag_filenames:=${PWD}/sensor_data.bag
+'''
+
+
+
+
+
+
+
 
 
 
@@ -277,7 +336,7 @@ On the right-hand-side of the map, we can see a blurred-image of the recycling b
 
 Looking at the results, we can deduce the following:
 
-1. Although optional, an accurate Odometer is an important part of the SLAM process and should be supplied to the Cartograoher. 
+1. Although optional, an accurate Odometer is an important part of the SLAM process and should be supplied to the Cartographer. 
 
 2. In cases where an Odometer is not relevant (i.e the robot is at the same position), we see that the Cartographer still has a problem with "unwrapping" the Laser/PointCloud data and constructing the map. This can be noticeable from the deformation od the walls, as well as the blurred-image of the recycling bin. 
 
