@@ -230,7 +230,7 @@ The following command will begin recording sensor data into a file named **senso
 
 
 ```
-rosbag record --duration=30 --output-name=sensor_data  /tf /tf_static /imu/data /camera/depth/color/points
+rosbag record --output-name=sensor_data  /tf /tf_static /imu/data /camera/depth/color/points
 ```
 
 
