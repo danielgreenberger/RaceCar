@@ -460,7 +460,7 @@ We need to have a reliable Odometer measurement if we want an accurate mapping, 
 # Tips for running the cartographer
 
 ### Start with 2D mapping
-If you have the option to do so, always start with 2D SLAM before going to three-dimensions. This is because, with 3D results, mapping errors can be opaque and harder to visialize. 
+If you have the option to do so, always start with 2D SLAM before going into three-dimensions. This is because with 3D results, mapping errors can be opaque and harder to visialize. 
 
 ### Prefer Laser scan over PointCloud
 For 2D mapping, the Cartographer works works much better with Laser scan than point cloud. Another advantage of Laser scan is its light-weight memory foot-print, in comparison with point cloud (as for 2D laser scan we have 1 scan line, usually the middle row of the depth image). Memory size can be critical when trying to run the cartographer offline, as will be discussed next. 
