@@ -15,7 +15,7 @@ The [third and last](#Algorithm-running-and-input-tune-in) section describes the
 
 # Cartographer input and sensing output.
 ## Cartographer input
-(Go to the beginning)[#Introduction]
+(Go to the beginning)[#introduction]
 
 
 A comprehensive guide on the required input can be found [here](https://google-cartographer-ros.readthedocs.io/en/latest/ros_api.html), under **Subscribed Topics**. 
@@ -77,7 +77,7 @@ As for the implementation, we tried avoiding using ROS-specific tools to make it
 
 # Getting started
 
-(Go to the beginning)[#Introduction]
+(Go to the beginning)[#introduction]
 
 This section will describe how to run Google Cartographer under the Racecar environment using ROS. 
 
@@ -142,7 +142,7 @@ source /home/nvidia/daniel_greenberger/final/catkin_ws/devel/setup.bash
 
 ## Step 2 : Running the RealSense camera node
 
-(Go to the beginning)[#Introduction]
+(Go to the beginning)[#introduction]
 
 **This step is relevant only if you chose to use the official ReslSense ROS wrapper**
 
@@ -176,7 +176,7 @@ rosrun racecar racecar
 
 ## Step 4 : Running the Google Cartographer
 
-(Go to the beginning)[#Introduction]
+(Go to the beginning)[#introduction]
 
 
 There are many options for running the Cartographer:
@@ -258,7 +258,7 @@ roslaunch cartographer_ros offline_racecar_2d.launch bag_filenames:=${PWD}/senso
 
 # Algorithm running and input tune-in
 
-(Go to the beginning)[#Introduction]
+(Go to the beginning)[#introduction]
 
 
 Note: This section is a bit verbose. You can skip to the [last running attempt](#running-attempt-3-laser-data-no-odometer-tuning-the-realsense-sensors-data) for the best results.
@@ -476,6 +476,7 @@ The reason behind this, is the Cartographer depends on IMU data to detect linear
 In practice, we found out the Cartographer handles rotations quite-well, as long you you are reasonable. 
 
 ### Use IMU filtering
+
 
 
 
