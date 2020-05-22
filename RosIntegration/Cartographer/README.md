@@ -15,6 +15,8 @@ The [third and last](#Algorithm-running-and-input-tune-in) section describes the
 
 # Cartographer input and sensing output.
 ## Cartographer input
+(Go to the beginning)[#Introduction]
+
 
 A comprehensive guide on the required input can be found [here](https://google-cartographer-ros.readthedocs.io/en/latest/ros_api.html), under **Subscribed Topics**. 
 
@@ -74,6 +76,8 @@ As for the implementation, we tried avoiding using ROS-specific tools to make it
 
 
 # Getting started
+
+(Go to the beginning)[#Introduction]
 
 This section will describe how to run Google Cartographer under the Racecar environment using ROS. 
 
@@ -138,6 +142,8 @@ source /home/nvidia/daniel_greenberger/final/catkin_ws/devel/setup.bash
 
 ## Step 2 : Running the RealSense camera node
 
+(Go to the beginning)[#Introduction]
+
 **This step is relevant only if you chose to use the official ReslSense ROS wrapper**
 
 run in the terminal:
@@ -169,6 +175,8 @@ rosrun racecar racecar
 
 
 ## Step 4 : Running the Google Cartographer
+
+(Go to the beginning)[#Introduction]
 
 
 There are many options for running the Cartographer:
@@ -249,6 +257,9 @@ roslaunch cartographer_ros offline_racecar_2d.launch bag_filenames:=${PWD}/senso
 
 
 # Algorithm running and input tune-in
+
+(Go to the beginning)[#Introduction]
+
 
 Note: This section is a bit verbose. You can skip to the [last running attempt](#running-attempt-3-laser-data-no-odometer-tuning-the-realsense-sensors-data) for the best results.
 
@@ -444,6 +455,27 @@ The tune-in of the parameters proved to be very successful for the construction 
 
 We need to have a reliable Odometer measurement if we want an accurate mapping, as once we have an Odometer we can freely drive the robot around the lab and map the entire room with high precision. 
 
+
+
+# Tips for running the cartographer
+
+### Start with 2D mapping
+If you have the option to do so, always start with 2D SLAM before going to three-dimensions. This is because, with 3D results, mapping errors can be opaque and harder to visialize. 
+
+### Prefer Laser scan over PointCloud
+For 2D mapping, the Cartographer works works much better with Laser scan than point cloud. Another advantage of Laser scan is its light-weight memory foot-print, in comparison with point cloud (as for 2D laser scan we have 1 scan line, usually the middle row of the depth image). Memory size can be critical when trying to run the cartographer offline, as will be discussed next. 
+
+### Offline vs. Online SLAM
+The offline SLAM option seems to produce faster and more accurate results, at least for 2D mapping (we didn't check 3D). 
+This makes sense, as with offline mode the algorithm has a "global" view of the data and may be able to find patterns more easily. 
+Getting the same accuracy in online mode usually requires longer sampling of the sensor data. 
+
+### Be wary of sharp movements
+When traversing the environment for SLAM, be cautious with sharp movements in the trajectory, especially sharp rotations.  
+The reason behind this, is the Cartographer depends on IMU data to detect linear and angular movements, and tries to reason them with the laser scan. However, IMU data will always contain some error, which may lose the Cartographer to lose track of it's current localization / orientation. 
+In practice, we found out the Cartographer handles rotations quite-well, as long you you are reasonable. 
+
+### Use IMU filtering
 
 
 
