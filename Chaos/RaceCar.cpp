@@ -418,7 +418,7 @@ CAMERA_DEFINITION
             std::this_thread::sleep_for(std::chrono::milliseconds(200)); // dgreenbe TODO remove later
             
             
-            /*      Set camera output type     */
+            /*  Set camera output type   */
 
             char cmd = ' ';
             

@@ -63,7 +63,7 @@ using string = std::string;
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#warning "TODO remove inheritance"
+
 class OdometerPublisher : public Publisher<nav_msgs::Odometry>
 {
     
@@ -73,8 +73,7 @@ class OdometerPublisher : public Publisher<nav_msgs::Odometry>
 
 struct OdometerData
 {
-     // TODO: we must protect against overflow or wraparound
-     // TODO: make sure we only start publishing when we get actual odometer info (from bitcraze)
+    // TODO: we must protect against overflow or wrap-around
     
     /* Robot offset in X-Y  lab frame */
     double total_dist_x = 0;    
@@ -194,7 +193,6 @@ public:
                 //
                 // Since we assume deltaX, deltaY are small we can neglect the error 
                 // arising from the fact that the change of the rotation is continous
-                // TODO: maybe explain better
              
                  odom_lab_data = OdometerTransform::convert_odom_to_lab_frame( m_last_odom_snapshot.total_rotation_z_axis,  odom_data);  
                
