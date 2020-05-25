@@ -76,8 +76,7 @@ public:
             a single image or timestamped metadata). 
             
         */
-        // dgreenbe TODO multiple streams can be used at the same time?
-        // dgreenbe TODO maybe expand/revise explanation
+
         enum class Stream
         {
             ANY,
@@ -238,17 +237,7 @@ public:
        bool isConnect();
 
 
-        /*=======================================================
-        * @brief           TODO
-        *
-        * @description     TODO
-        *
-        * @param           TODO
-        *
-        * @returns         TODO
-        *
-        * @author          TODO
-        =========================================================*/
+
        void resetCamera();
 
 
@@ -425,50 +414,20 @@ public:
 
 
         
-        /*=======================================================
-        * @brief           TODO
-        *
-        * @description     TODO
-        *
-        * @param           TODO
-        *
-        * @return          TODO
-        *
-        * @author          TODO
-        =========================================================*/
+
         rs2::points getPointCloud();
         
-        /*=======================================================
-        * @brief           TODO
-        *
-        * @description     TODO
-        *
-        * @param           TODO
-        *
-        * @return          TODO
-        *
-        * @author          TODO
-        =========================================================*/
+
         rs2::points getColorPointCloud();
         
         #ifdef ROS_COMPILATION
-        /*=======================================================
-        * @brief           TODO
-        *
-        * @description     TODO
-        *
-        * @param           TODO
-        *
-        * @return          TODO
-        *
-        * @author          TODO
-        =========================================================*/
+
         sensor_msgs::PointCloud2 getROSPointCloud2();
         #endif // ROS_COMPILATION
 
 
 
-        //TODO why we need that?
+      
 //        /**
 //         * @brief getMyFps -
 //         * @param stream

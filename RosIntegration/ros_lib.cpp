@@ -24,7 +24,6 @@ namespace RosIntegration
 CAMERA_DEFINITION
 (
 
-    // dgreenbe todo check if struct exists else where
     typedef struct
     {
         uint8_t r;
@@ -62,7 +61,7 @@ CAMERA_DEFINITION
         ASSERT(texture_valid, std::exception());
        
        
-        /* Calculate pixel offset in data*/
+        /* Calculate pixel offset in data */
         if (texture_valid) 
         {
             int pixel_x = static_cast<int>(i * color_width);
