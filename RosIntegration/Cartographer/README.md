@@ -236,10 +236,17 @@ In Offline mode, we first collect the data by recording a [ros bag file](http://
 
 The following command will begin recording sensor data into a file named **sensor_data.bag** which will be saved in the current directory. 
 
-
+If you are using PointCloud:
 ```
 rosbag record --output-name=sensor_data  /tf /tf_static /imu/data /camera/depth/color/points
 ```
+
+
+If you are using LaserScan:
+```
+rosbag record --output-name=sensor_data  /tf /tf_static /imu/data /scan
+```
+
 
 
 After the data is recorded, the Cartographer can be used to construct the map and trajectory based on the recorded data:
