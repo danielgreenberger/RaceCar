@@ -279,12 +279,17 @@ Note: This section is a bit verbose. You can skip to the [last running attempt](
 
 
 **Note:** 
-
-*We later found out that the IMU was supplied at the wrong coordination frame - it was rotated to the optical camera coordinate system.
+We later found out that the IMU was supplied at the wrong coordination frame - it was rotated to the optical camera coordinate system.
 This led us to wrongly blame the lack of external odometer data as the source of the inaccuracy of the mapping. 
-Obviously, localization using range-data is an important part of SLAM, and this point was over-looked at this early attempt. *
+Obviously, localization using range-data is an important part of SLAM, and this point was over-looked at this early attempt. 
 
 To see a proper example with localization and accurate mapping, please refer to the latest running attempts.
+
+
+
+
+
+
 
 
 
@@ -326,11 +331,17 @@ However, looking the zoom-in image (second figure) we may be able to see the cor
 
 **Note:** 
 
-*We later found out that the IMU was supplied at the wrong coordination frame - it was rotated to the optical camera coordinate system.
+We later found out that the IMU was supplied at the wrong coordination frame - it was rotated to the optical camera coordinate system.
 This led us to wrongly blame the lack of external odometer data as the source of the inaccuracy of the mapping. 
-Obviously, localization using range-data is an important part of SLAM, and this point was over-looked at this early attempt. *
+Obviously, localization using range-data is an important part of SLAM, and this point was over-looked at this early attempt. 
 
 To see a proper example with localization and accurate mapping, please refer to the latest running attempts.
+
+
+
+
+
+
 
 
 
@@ -396,12 +407,14 @@ Looking at the results, we can deduce the following:
 ## Running attempt #3: Laser data, no Odometer, tuning the RealSense sensors data
 
 **Note:** 
-
-*We later found out that the IMU was supplied at the wrong coordination frame - it was rotated to the optical camera coordinate system.
+We later found out that the IMU was supplied at the wrong coordination frame - it was rotated to the optical camera coordinate system.
 This led us to wrongly blame the lack of external odometer data as the source of the inaccuracy of the mapping. 
-Obviously, localization using range-data is an important part of SLAM, and this point was over-looked at this early attempt. *
+Obviously, localization using range-data is an important part of SLAM, and this point was over-looked at this early attempt. 
 
 To see a proper example with localization and accurate mapping, please refer to the latest running attempts.
+
+
+
 
 
 
