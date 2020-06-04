@@ -1,7 +1,7 @@
 # Introduction
 
-This deocument shows an example for using the RosIntegration of RaceCar for SLAM applications. 
-Specificaly, we show how to run the [Google cartographer](https://google-cartographer.readthedocs.io/en/latest/) and how to tune 
+This document shows an example of using the RosIntegration of RaceCar for SLAM applications. 
+In particular, we show how to run the [Google cartographer](https://google-cartographer.readthedocs.io/en/latest/) and how to tune 
 RaceCar's sensing devices to the inputs required by the Cartographer. 
 
 The [first section](#Cartographer-input-and-sensing-output) will provide a short overview of the input expected by the Cartographer, as well as the available output from the sensing devices of RaceCar 
@@ -15,7 +15,7 @@ The [third and last](#Algorithm-running-and-input-tune-in) section describes the
 
 # Cartographer input and sensing output.
 ## Cartographer input
-(Go to the beginning)[#introduction]
+(Go to the beginning)[#Introduction]
 
 
 A comprehensive guide on the required input can be found [here](https://google-cartographer-ros.readthedocs.io/en/latest/ros_api.html), under **Subscribed Topics**. 
@@ -77,7 +77,7 @@ As for the implementation, we tried avoiding using ROS-specific tools to make it
 
 # Getting started
 
-(Go to the beginning)[#introduction]
+(Go to the beginning)[#Introduction]
 
 This section will describe how to run Google Cartographer under the Racecar environment using ROS. 
 
@@ -142,7 +142,7 @@ source /home/nvidia/daniel_greenberger/final/catkin_ws/devel/setup.bash
 
 ## Step 2 : Running the RealSense camera node
 
-(Go to the beginning)[#introduction]
+(Go to the beginning)[#Introduction]
 
 **This step is relevant only if you chose to use the official ReslSense ROS wrapper**
 
@@ -176,7 +176,7 @@ rosrun racecar racecar
 
 ## Step 4 : Running the Google Cartographer
 
-(Go to the beginning)[#introduction]
+(Go to the beginning)[#Introduction]
 
 
 There are many options for running the Cartographer:
@@ -265,7 +265,7 @@ roslaunch cartographer_ros offline_racecar_2d.launch bag_filenames:=${PWD}/senso
 
 # Algorithm running and input tune-in
 
-(Go to the beginning)[#introduction]
+(Go to the beginning)[#Introduction]
 
 
 Note: This section is a bit verbose. You can skip to the [last running attempt](#running-attempt-3-laser-data-no-odometer-tuning-the-realsense-sensors-data) for the best results.
