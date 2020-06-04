@@ -15,7 +15,7 @@ The [third and last](#Algorithm-running-and-input-tune-in) section describes the
 
 # Cartographer input and sensing output.
 ## Cartographer input
-(Go to the beginning)[#Introduction]
+[Go to the beginning](#Introduction)
 
 
 A comprehensive guide on the required input can be found [here](https://google-cartographer-ros.readthedocs.io/en/latest/ros_api.html), under **Subscribed Topics**. 
@@ -36,7 +36,8 @@ Nevertheless, we found out that IMU is needed for constructing a good map, espec
 
 ### Odometer
 The Cartographer can also be provided with odometer data, which is the distance travelled from a fixed point.
-Odometer data is not *required* by the cartographer, but similarly to IMU - it is highly needed for creating a good mapping.
+Odometer data is not *required* by the cartographer, but if supplied it may help the SLAM process, assuming the Odometer
+data is reliable. 
  
 
 
@@ -56,7 +57,7 @@ The output of the device includes the distance travelled in the X-Y direction as
 
 The Bitcraze output needs to be sampled constantly and converted to the X-Y distance in meters. 
 
-Then, the new orientation of the robot needs to be determined, and the distance will need to be converted 
+Upon each sampling of the distance travelled, the new orientation of the robot needs to be determined, and the distance will need to be converted 
 to the lab fixed frame. 
 
 For more information on how to process the output, you can view the RaceCar implementation at [odometer_calculations.h](https://github.com/danielgreenberger/RaceCar/blob/master/Common/Coordinates/odometer_calculations.h) and [racecar_coordinates.h](https://github.com/danielgreenberger/RaceCar/blob/master/Common/Coordinates/racecar_coordinates.h)
@@ -77,7 +78,7 @@ As for the implementation, we tried avoiding using ROS-specific tools to make it
 
 # Getting started
 
-(Go to the beginning)[#Introduction]
+[Go to the beginning](#Introduction)
 
 This section will describe how to run Google Cartographer under the Racecar environment using ROS. 
 
@@ -131,6 +132,8 @@ source ~/.bashrc
 
 ### RaceCar  (terminal 3) 
 
+This node will be responsible for operating the robot, with the possible exception of the RealSense camera, if you chose to use the official ReslSense ROS wrapper.
+
 ```
 source /home/nvidia/daniel_greenberger/final/catkin_ws/devel/setup.bash
 ```
@@ -142,7 +145,7 @@ source /home/nvidia/daniel_greenberger/final/catkin_ws/devel/setup.bash
 
 ## Step 2 : Running the RealSense camera node
 
-(Go to the beginning)[#Introduction]
+[Go to the beginning](#Introduction)
 
 **This step is relevant only if you chose to use the official ReslSense ROS wrapper**
 
@@ -157,10 +160,10 @@ roslaunch realsense2_camera cartographer.launch
 We chose to base on this specific launch file as it had the PointCloud option already included.
 
 The modifications performed to demo_pointcloud.launch:
-1. Add the IMU topic, as this ia required by the Cartographer for 3D mapping. 
-2. Perform [remapping](http://wiki.ros.org/roslaunch/XML/remap) of the PointCloud and IMU topics, so they will match with the topics the Cartographer listens to. 
+1. We enabled the publishing of IMU data, as this is required by the Cartographer for 3D mapping. 
+2. We performed [remapping](http://wiki.ros.org/roslaunch/XML/remap) of the PointCloud and IMU topics, so they will match with the topics the Cartographer listens to. 
 
-**Note:** The remmaping of topics can also be done at the Cartographer lua script. In such case, we would remap in the reverse direction (from the Cartographer input names to the RealSense names). To see an example of such ramapping look at the other cartograoher launch files.  
+**Note:** The remapping of topics can also be done at the Cartographer launch file. In such a case, we would remap in the reverse direction (from the Cartographer input names to the RealSense names). To see an example of such ramapping look at the other cartographer launch files.  
 
 
 
@@ -176,7 +179,7 @@ rosrun racecar racecar
 
 ## Step 4 : Running the Google Cartographer
 
-(Go to the beginning)[#Introduction]
+[Go to the beginning](#Introduction)
 
 
 There are many options for running the Cartographer:
@@ -200,7 +203,7 @@ TODO
 
 
 
-Each options has it's own launch file and possibly a different lua configuration file (i.e 3D vs. 2D SLAM). 
+Each options has its own launch file and possibly a different lua configuration file (i.e 3D vs. 2D SLAM). 
 
 To understand how to config the launch and lua files, please visit the [Cartographer documentation](https://google-cartographer-ros.readthedocs.io/en/latest/your_bag.html).
 
@@ -265,16 +268,29 @@ roslaunch cartographer_ros offline_racecar_2d.launch bag_filenames:=${PWD}/senso
 
 # Algorithm running and input tune-in
 
-(Go to the beginning)[#Introduction]
+[Go to the beginning](#Introduction)
 
 
 Note: This section is a bit verbose. You can skip to the [last running attempt](#running-attempt-3-laser-data-no-odometer-tuning-the-realsense-sensors-data) for the best results.
 
 ## Running attempt #1: PointCloud2, no Odometer
 
+
+**Note:** 
+
+We later found out that the IMU was supplied at the wrong coordination frame - it was rotated to the optical camera coordinate system.
+This led us to wrongly blame the lack of external odometer data as the source of the inaccuracy of the mapping. 
+Obviously, localization using range-data is an important part of SLAM, and this point was over-looked at this early attempt. 
+
+To see a proper example with localization and accurate mapping, please refer to the latest running attempts.
+
+
+
 The first mapping is described below.
 We chose to first get a good mapping in 2D before trying the 3D mapping, 
 as 2D maps are somewhat easier to imterpret and verify.
+
+**Online / Offline:**  Online.
 
 **Depth image type:**  PointCloud, as supplied by the RealSense ROS node. 
 
@@ -306,6 +322,16 @@ However, looking the zoom-in image (second figure) we may be able to see the cor
 
 ## Running attempt #2: Laser data, no Odometer, static positioning of the robot
 
+**Note:** 
+
+We later found out that the IMU was supplied at the wrong coordination frame - it was rotated to the optical camera coordinate system.
+This led us to wrongly blame the lack of external odometer data as the source of the inaccuracy of the mapping. 
+Obviously, localization using range-data is an important part of SLAM, and this point was over-looked at this early attempt. 
+
+To see a proper example with localization and accurate mapping, please refer to the latest running attempts.
+
+
+
 
 The conversion to Laser data was made using the [depthimage-to-laserscan](https://wiki.ros.org/depthimage_to_laserscan) package.
 
@@ -321,6 +347,8 @@ Then, add it to the end of the RealSense launch file:
 	</node>
 ```
 
+
+**Online / Offline:**  Online.
 
 **Depth image type:**  Laser scan, produced by RealSense depth image and converted using depthimage_to_laserscan.
 
@@ -354,7 +382,7 @@ On the right-hand-side of the map, we can see a blurred-image of the recycling b
 
 Looking at the results, we can deduce the following:
 
-1. Although optional, an accurate Odometer is an important part of the SLAM process and should be supplied to the Cartographer. 
+1. Although optional, an accurate (external) Odometer data may greatly improve SLAM progress, and should be supplied to the Cartographer if possible. 
 
 2. In cases where an Odometer is not relevant (i.e the robot is at the same position), we see that the Cartographer still has a problem with "unwrapping" the Laser/PointCloud data and constructing the map. This can be noticeable from the deformation od the walls, as well as the blurred-image of the recycling bin. 
 
@@ -364,6 +392,18 @@ Looking at the results, we can deduce the following:
 
 
 ## Running attempt #3: Laser data, no Odometer, tuning the RealSense sensors data
+
+**Note:** 
+
+We later found out that the IMU was supplied at the wrong coordination frame - it was rotated to the optical camera coordinate system.
+This led us to wrongly blame the lack of external odometer data as the source of the inaccuracy of the mapping. 
+Obviously, localization using range-data is an important part of SLAM, and this point was over-looked at this early attempt. 
+
+To see a proper example with localization and accurate mapping, please refer to the latest running attempts.
+
+
+
+
 
 
 This experiment in similar conditions of the previous one, but we made some changes to the RealSense sensors data which significantly improved the results. 
@@ -386,6 +426,7 @@ The changes we made:
 The last change seems to have the most effect, as unlike previous attempts, the Cartographer was able to use the Gyro data to detect the rotation of the robot and therefore rotate the constructed map according to the robot current orientation. 
 
 
+**Online / Offline:**  Online.
 
 **Depth image type:**  Laser scan, produced by RealSense depth image and converted using depthimage_to_laserscan.
 
@@ -456,12 +497,31 @@ We can come up with 2 reasons as the root-cause:
 
 
 
-### Summary
 
-The tune-in of the parameters proved to be very successful for the construction of the map. 
 
-We need to have a reliable Odometer measurement if we want an accurate mapping, as once we have an Odometer we can freely drive the robot around the lab and map the entire room with high precision. 
+## Running attempt #4-9: Laser data, no external odometer, offline
 
+This group represents our latest and most successful iterations of the Cartographer input. 
+
+We found a mistake related to the IMU rotation - the tracking frame of the SLAM algorithm should be at the orientation of the IMU sensor, which is defined by the realsense device as "camera_gyro_frame". The tracking frame used for the previous attempts matched the orientation of the optical-camera, which is rotated relative to the IMU sensor.
+
+
+**Online / Offline:**  Offline.
+
+**Depth image type:**  Laser scan, produced by RealSense depth image and converted using depthimage_to_laserscan.
+
+**Odometry used:** No odometry data . 
+
+**Mapping type (2D/3D):** 2D
+
+
+**More info:** 
+
+
+The Robot was put on a wheeled-rotating-chair or driven around the lab. 
+We used **rosbag** to record the laser scan and imu data, and later supplied them to the Cartographer to perform offline SLAM. 
+
+The mapping and localization results are very impressive.  
 
 
 # Tips for running the cartographer
