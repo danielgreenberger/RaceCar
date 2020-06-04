@@ -527,6 +527,8 @@ We used **rosbag** to record the laser scan and imu data, and later supplied the
 
 ![latest_runs_example.jpg](images/latest_runs_example.jpg)
 
+We can see in blue the trajectory of the robot in the lab.
+
 All the results can be found [here](https://github.com/danielgreenberger/RaceCar/tree/master/RosIntegration/Cartographer/examples/rosbag_lab_recordings)
 
 The image above corresponds to [this running attempt](https://github.com/danielgreenberger/RaceCar/tree/master/RosIntegration/Cartographer/examples/rosbag_lab_recordings/wheeled_chair/take_4)
