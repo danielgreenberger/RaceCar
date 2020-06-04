@@ -2,13 +2,13 @@
 
 
 
-This document describes the integration the RaceCar project with ROS, and consists of 2 parts. 
+This document describes the integration of the RaceCar project with ROS, and consists of 2 parts. 
 
 The [first part](#introduction) provides a brief overview of the ROS system, its basic functionality and its tools. It also includes an high-level description of the [RaceCar-ROS integration](#ros-and-the-racecar-project) 
 
-The [second part](#getting-started) is more practical, and includes a guide to [building with ROS](#creating-catkin-workspace-and-package) as well as a description of the [wrapper API](#RaceCar-RosIntegration-API)  that was created. 
+The [second part](#getting-started) is more practical, and includes a guide to [building with ROS](#creating-catkin-workspace-and-package) as well as a description of the [wrapper API](#RaceCar-RosIntegration-API)  that was designed for the integration. 
 
-Please note that the use of ROS in optional, and may not be suitable for all use-cases. 
+Please note that the use of ROS is optional, and may not be suitable for all use-cases. 
 
 
 ## Introduction 
@@ -18,7 +18,7 @@ Please note that the use of ROS in optional, and may not be suitable for all use
 ### What is ROS
 
 ROS (Robot Operating System) is a set of tools and libraries which help software developers create robot applications.
-Although ROS is not a real OS , it provides services which are typically provided by operating systems. 
+Although ROS is not a real OS, it provides services which are typically provided by operating systems. 
 
 from ROS official website:
 
@@ -34,15 +34,13 @@ The integration with ROS has a few great advantages:
 
 ###### Modularity 
 
-ROS has a very Object Oriented narrative. 
-Many differents Robot components such as Motor controller or Camera can be represented independantly in the system, 
-apart from other components. 
+ROS has a very Object Oriented narrative.
+A typical robot consists of many modular components,  such as a Motor controller or a Camera. Such components are better represented as independant entities in the system, apart from other components. 
 
-This is very helpful since many times the different components of the robot (which can be many) 
+Such modular approach can be a very helpful design choice, since many different components of the robot  
 are loosely related to each other. 
 
-Such modular approach can also be easier to design and for debugging.  
-It also gives us the option to integrate third-party libraries for our components, such as the [RealSense ROS driver](https://github.com/IntelRealSense/realsense-ros).
+This can also make debugging easier, as well as us integrate third-party libraries with our components, such as the [RealSense ROS driver](https://github.com/IntelRealSense/realsense-ros).
 
 
 ###### infrastructure 
@@ -225,7 +223,7 @@ As a compromise, we will keep the RaceCar process intact and use ROS through wra
 
 ### High Level Design overview
 
-The main idea was to create an easy-to-use interface of ROS, while still allowing portability of the RaceCar code to other platform (specifically, to just running RaceCar directly from the OS). 
+The main idea was to create an easy-to-use interface of ROS, while still allowing portability of the RaceCar code to other platforms (in particular, we wanted to still support running RaceCar directly from the OS). 
 
 In order to archive this balance, the following design decisions were made:
 
@@ -291,7 +289,7 @@ ROS installation guide can be found [here](http://wiki.ros.org/ROS/Installation)
 It is better to install the **Desktop-Full** version as it contains useful tools such as [rviz](#rviz)
 
 **Note:** The version used when developing the integration was ROS melodic, 
-but it is safe to assume that other supported version can be used. 
+but it is safe to assume that other supported versions can be used. 
 
 
 It is also recommended to install the [realsense driver for ROS.](https://github.com/IntelRealSense/realsense-ros).
@@ -304,12 +302,12 @@ The next step would be to create a workspace and package using catkin
 ### Creating catkin workspace and package
 
 The build process under ROS is done using the **catkin** tool, which is based on a modified version of cmake.
-The rest of this sections will explain how to work with catkin.
+The rest of this section will explain how to work with catkin.
 
 ##### Step 1: Creating the workspace
 First go to the path where you wish to place your workspace, which can be any path where you have read/write/execute persmissions.
 
-Then create the workspace folder:
+Next, create the workspace folder:
 ```
 mkdir -p catkin_ws/src
 ```
@@ -419,7 +417,7 @@ target_link_libraries(${PROJECT_NAME}
 ```
 
 
-**Note:** The lines above correspond to the Cmake configurations for RaceCar, and need to be updated whenever the racecar 
+**Note:** The lines above are based on the Cmake configurations for RaceCar, and need to be updated whenever the racecar 
 cmake is changed (i.e new file added/deleted).
 
 ##### Step 4: Copy all source files
@@ -438,7 +436,7 @@ catkin_make
 This will build all the packages in the workspace. 
 
 catkin_make has some other options such as building a specific package or forcing a re-build. 
-See documentation for more details. 
+See the documentation for more details. 
 
 
 Since we want to run nodes from this workspace , we will need to source it:
@@ -509,14 +507,4 @@ http://wiki.ros.org/catkin/Tutorials/using_a_workspace - Building a package with
 
 http://wiki.ros.org/catkin/CMakeLists.txt   -  How to create a Cmake file for catkin
 
-
-
-
-## TODO - delete after finishing
-
-- [] Add info about ROS launch
-
-- [] Change RaceCar log prints to a wrapper function/macro and direct all log prints to ROS_LOG
-
-- [] Add a small section with "Get started" which runs rqt_launch and rqt_console and chooses different launch files
 
