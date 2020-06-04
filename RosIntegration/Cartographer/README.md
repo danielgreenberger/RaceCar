@@ -15,7 +15,7 @@ The [third and last](#Algorithm-running-and-input-tune-in) section describes the
 
 # Cartographer input and sensing output.
 ## Cartographer input
-[Go to the beginning](#Introduction)
+[Go to the beginning](#introduction)
 
 
 A comprehensive guide on the required input can be found [here](https://google-cartographer-ros.readthedocs.io/en/latest/ros_api.html), under **Subscribed Topics**. 
@@ -78,7 +78,7 @@ As for the implementation, we tried avoiding using ROS-specific tools to make it
 
 # Getting started
 
-[Go to the beginning](#Introduction)
+[Go to the beginning](#introduction)
 
 This section will describe how to run Google Cartographer under the Racecar environment using ROS. 
 
@@ -145,7 +145,7 @@ source /home/nvidia/daniel_greenberger/final/catkin_ws/devel/setup.bash
 
 ## Step 2 : Running the RealSense camera node
 
-[Go to the beginning](#Introduction)
+[Go to the beginning](#introduction)
 
 **This step is relevant only if you chose to use the official ReslSense ROS wrapper**
 
@@ -179,7 +179,7 @@ rosrun racecar racecar
 
 ## Step 4 : Running the Google Cartographer
 
-[Go to the beginning](#Introduction)
+[Go to the beginning](#introduction)
 
 
 There are many options for running the Cartographer:
@@ -268,7 +268,7 @@ roslaunch cartographer_ros offline_racecar_2d.launch bag_filenames:=${PWD}/senso
 
 # Algorithm running and input tune-in
 
-[Go to the beginning](#Introduction)
+[Go to the beginning](#introduction)
 
 
 Note: This section is a bit verbose. You can skip to the [last running attempt](#running-attempt-3-laser-data-no-odometer-tuning-the-realsense-sensors-data) for the best results.
@@ -510,7 +510,7 @@ We found a mistake related to the IMU rotation - the tracking frame of the SLAM 
 
 **Depth image type:**  Laser scan, produced by RealSense depth image and converted using depthimage_to_laserscan.
 
-**Odometry used:** No odometry data . 
+**Odometry used:** No external odometry data, but the Cartographer performed localization quite-well.
 
 **Mapping type (2D/3D):** 2D
 
@@ -518,10 +518,22 @@ We found a mistake related to the IMU rotation - the tracking frame of the SLAM 
 **More info:** 
 
 
-The Robot was put on a wheeled-rotating-chair or driven around the lab. 
+The Robot was put on a wheeled-rotating-chair or driven around the lab using the remote control. 
+We preferred using the chair, as it made the navigation easier around the lab.
+
 We used **rosbag** to record the laser scan and imu data, and later supplied them to the Cartographer to perform offline SLAM. 
 
-The mapping and localization results are very impressive.  
+![latest_runs_example.jpg](images/latest_runs_example.jpg)
+
+All the results can be found [here](https://github.com/danielgreenberger/RaceCar/tree/master/RosIntegration/Cartographer/examples/rosbag_lab_recordings)
+
+The image above corresponds to [this running attempt](https://github.com/danielgreenberger/RaceCar/tree/master/RosIntegration/Cartographer/examples/rosbag_lab_recordings/wheeled_chair/take_4)
+
+
+
+
+The mapping and localization results are undeniably impressive. As can be seen, the Cartographer handled the shift in trajectory be it linear-movement or rotation, very well. 
+
 
 
 # Tips for running the cartographer
