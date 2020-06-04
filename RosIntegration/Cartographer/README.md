@@ -9,7 +9,9 @@ The [first section](#Cartographer-input-and-sensing-output) will provide a short
 The [second section](#Getting-started) is a practical guide for running the Cartographer under RaceCar.
 If you are new to ROS, it is also recommended to read the [RosIntegration documentation](https://github.com/danielgreenberger/RaceCar/tree/master/RosIntegration/) to get up-to-speed with ROS basic functionality and RaceCar wrapper APIs.
 
-The [third and last](#Algorithm-running-and-input-tune-in) section describes the iterative process of tuning the input from RaceCar sensing devices in order to construct a coherent map using Cartographer. It is somewhat verbose, but you can skip to the last running attempt to see the best result. 
+The [third](#Algorithm-running-and-input-tune-in) section describes the iterative process of tuning the input from RaceCar sensing devices in order to construct a coherent map using Cartographer. It is somewhat verbose, but you can skip to the [last running attempts](#running-attempt-4-9-laser-data-no-external-odometer-offline) to see the best results. 
+
+The [last section](#tips-for-running-the-cartographer) contains some tips for running the Cartographer on the robot. 
 
 
 
